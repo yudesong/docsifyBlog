@@ -1,23 +1,226 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>YYDS's Blog</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <meta name="description" content="An Android Developer.">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" href="./assets/images/favicon.webp">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@latest/lib/themes/vue.css">
+  <link rel="stylesheet" href="./stylesheets/docsify-extra.css">
 </head>
+
 <body>
-  <div id="app"></div>
+  <div id="app">加载中...</div>
+
   <script>
     window.$docsify = {
-      name: '',
-      repo: '',
-	  loadSidebar: true,
-    }
+      name: "YYDS's Blog",
+      repo: 'https://yudesong.github.io/docsifyBlog/',
+      homepage: 'README.md',
+      loadSidebar: true,
+      auto2top: true,
+      subMaxLevel: 3,
+      maxLevel: 4,
+      relativePath: false,
+      themeColor: '#42b983',
+      pagination: {
+        previousText: '上一篇',
+        nextText: '下一篇',
+        crossChapter: true
+      },
+      count: {
+        countable: true,
+        fontsize: '0.9em',
+        color: 'rgb(90,90,90)',
+        language: 'chinese'
+      },
+      plugins: [
+        function (hook) {
+          hook.beforeEach(function (content) {
+            const meta = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
+            const metaTitle = meta && meta[1].match(/^title:\s*["']?(.+?)["']?\s*$/m);
+            content = content.replace(/^---[\s\S]*?\n---\s*\n/, '');
+            if (metaTitle && !/^#\s+/m.test(content)) {
+              content = '# ' + metaTitle[1].trim() + '\n\n' + content;
+            }
+            content = content.replace(
+              /^(\s*)(!!!|\?\?\?\+?)\s*([A-Za-z0-9_-]+)?\s*(?:"([^"]*)")?\s*$/gm,
+              function (_, indent, marker, type, title) {
+                const label = title || type || 'Note';
+                return indent + '> **' + label + '**';
+              }
+            );
+            content = content.replace(
+              /^(\s*)===\s*"([^"]+)"\s*$/gm,
+              function (_, indent, title) {
+                return indent + '**' + title + '**';
+              }
+            );
+            content = content.replace(
+              /\]\(\/(?!\/|assets\/)([^)#]+?)(\/)?(#.*?)?\)/g,
+              function (_, path, slash, hash) {
+                const normalized = path.endsWith('.md') ? path : path + '.md';
+                return '](#/' + normalized + (hash || '') + ')';
+              }
+            );
+            return content;
+          });
+        },
+        function (hook) {
+          hook.doneEach(function () {
+            document.querySelectorAll('pre[data-lang="mermaid"] code').forEach(function (code) {
+              const container = document.createElement('div');
+              container.className = 'mermaid';
+              container.textContent = code.textContent;
+              code.parentElement.replaceWith(container);
+            });
+
+            if (window.mermaid) {
+              mermaid.run({ querySelector: '.mermaid' }).catch(function () {});
+            }
+          });
+        },
+        function (hook) {
+          hook.doneEach(function () {
+            const sidebar = document.querySelector('.sidebar-nav');
+            if (sidebar && !document.querySelector('.sidebar-theme-btn')) {
+              const btn = document.createElement('button');
+              btn.className = 'sidebar-theme-btn';
+
+              const setThemeText = function () {
+                const isDark = document.body.classList.contains('dark-mode');
+                btn.textContent = isDark ? '切换浅色模式' : '切换深色模式';
+              };
+
+              if (localStorage.getItem('theme-mode') === 'dark') {
+                document.body.classList.add('dark-mode');
+              }
+
+              setThemeText();
+              btn.onclick = function () {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem(
+                  'theme-mode',
+                  document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+                );
+                setThemeText();
+              };
+
+              sidebar.insertBefore(btn, sidebar.firstChild);
+            }
+
+            document.querySelectorAll('.markdown-section a[href^="/"]').forEach(function (link) {
+              const href = link.getAttribute('href');
+              if (!href || href.startsWith('//') || href.startsWith('/assets/')) return;
+
+              let route = href.replace(/\/$/, '');
+              if (!route.endsWith('.md') && !route.includes('#')) {
+                route = route + '.md';
+              }
+              link.setAttribute('href', '#' + route);
+            });
+
+            document.querySelectorAll('.markdown-section img').forEach(function (img) {
+              const src = img.getAttribute('src');
+              if (!src) return;
+
+              if (src.includes('/assets/')) {
+                img.setAttribute('src', src.slice(src.indexOf('/assets/')));
+              }
+            });
+
+            const sidebarRoot = document.querySelector('.sidebar-nav > ul');
+            if (!sidebarRoot) return;
+
+            const normalizeRoute = function (href) {
+              if (!href) return '';
+              return href
+                .replace(/^#\/\.?\//, '')
+                .replace(/^#\//, '')
+                .replace(/\.md$/, '')
+                .replace(/\/$/, '');
+            };
+
+            const currentRoute = normalizeRoute(location.hash.split('?')[0].split('#')[1] ? '#' + location.hash.split('?')[0].split('#')[1] : location.hash);
+            const isHome = !currentRoute || currentRoute === 'README' || currentRoute === './README';
+
+            sidebarRoot.querySelectorAll('li').forEach(function (item) {
+              const childList = Array.prototype.find.call(item.children, function (child) {
+                return child.tagName === 'UL' && !child.classList.contains('app-sub-sidebar');
+              });
+              if (!childList) return;
+
+              item.classList.add('nav-group');
+
+              const label = Array.prototype.find.call(item.children, function (child) {
+                return child.tagName === 'STRONG';
+              });
+              if (label && !label.dataset.boundCollapse) {
+                label.dataset.boundCollapse = 'true';
+                label.setAttribute('role', 'button');
+                label.setAttribute('tabindex', '0');
+                label.addEventListener('click', function () {
+                  item.classList.toggle('is-open');
+                });
+                label.addEventListener('keydown', function (event) {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    item.classList.toggle('is-open');
+                  }
+                });
+              }
+
+              const hasActive = !!item.querySelector('li.active, a.active');
+              const hasCurrent = Array.prototype.some.call(item.querySelectorAll('a'), function (link) {
+                return normalizeRoute(link.getAttribute('href')) === currentRoute;
+              });
+              const hasNestedGroups = !!item.querySelector(':scope > ul > li > strong');
+              let depth = 0;
+              let parent = item.parentElement;
+              while (parent && parent !== sidebarRoot) {
+                if (parent.matches && parent.matches('li.nav-group')) {
+                  depth += 1;
+                }
+                parent = parent.parentElement;
+              }
+
+              item.classList.toggle(
+                'is-open',
+                (depth === 0 && hasNestedGroups) || (!isHome && (hasActive || hasCurrent))
+              );
+            });
+          });
+        }
+      ]
+    };
   </script>
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <script src="//cdn.jsdelivr.net/npm/docsify@latest/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@latest/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@latest/dist/docsify-copy-code.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
+
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-java.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-kotlin.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-groovy.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-python.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-yaml.min.js"></script>
+
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
+  <script src="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/marked@3"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
+
+  <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false });
+  </script>
 </body>
+
 </html>
