@@ -122,17 +122,6 @@
               sidebar.insertBefore(btn, sidebar.firstChild);
             }
 
-            document.querySelectorAll('.markdown-section a[href^="/"]').forEach(function (link) {
-              const href = link.getAttribute('href');
-              if (!href || href.startsWith('//') || href.startsWith('/assets/')) return;
-
-              let route = href.replace(/\/$/, '');
-              if (!route.endsWith('.md') && !route.includes('#')) {
-                route = route + '.md';
-              }
-              link.setAttribute('href', '#' + route);
-            });
-
             document.querySelectorAll('.markdown-section img').forEach(function (img) {
               const src = img.getAttribute('src');
               if (!src) return;
