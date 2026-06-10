@@ -128,13 +128,13 @@
               
               const basePath = '/docsifyBlog/';
               
-              // 处理 ./assets/ 开头的路径（beforeEach 转换后的格式）
-              if (src.startsWith('./assets/')) {
-                img.setAttribute('src', basePath + src.substring(2));
-              }
-              // 处理 /assets/ 开头的路径
-              else if (src.startsWith('/assets/')) {
-                img.setAttribute('src', basePath + src.substring(1));
+              // 处理所有包含 /assets/ 的路径
+              // 将路径修正为相对于 GitHub Pages 根目录
+              if (src.includes('/assets/')) {
+                // 提取 /assets/ 之后的部分
+                const assetsIndex = src.indexOf('/assets/');
+                const relativePath = src.substring(assetsIndex + 1); // 去掉开头的 /
+                img.setAttribute('src', basePath + relativePath);
               }
             });
 
