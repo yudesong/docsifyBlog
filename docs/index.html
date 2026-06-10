@@ -23,7 +23,6 @@
       repo: 'https://yudesong.github.io/docsifyBlog/',
       homepage: 'README.md',
       loadSidebar: true,
-      basePath: '/docsifyBlog/',
       auto2top: true,
       subMaxLevel: 3,
       maxLevel: 4,
@@ -138,17 +137,15 @@
               const src = img.getAttribute('src');
               if (!src) return;
               
-              // 确保图片路径以 /docsifyBlog/assets/ 开头
               const basePath = '/docsifyBlog/';
-              const assetsPath = '/assets/';
               
-              // 如果路径包含 /assets/ 但不是以 /docsifyBlog/assets/ 开头
-              if (src.includes(assetsPath) && !src.startsWith(basePath + 'assets/')) {
-                // 提取 /assets/ 后面的部分
-                const assetsIndex = src.indexOf(assetsPath);
-                const relativePath = src.substring(assetsIndex);
-                // 设置正确的绝对路径
-                img.setAttribute('src', basePath + relativePath.substring(1));
+              // 处理 ./assets/ 开头的路径（beforeEach 转换后的格式）
+              if (src.startsWith('./assets/')) {
+                img.setAttribute('src', basePath + src.substring(2));
+              }
+              // 处理 /assets/ 开头的路径
+              else if (src.startsWith('/assets/')) {
+                img.setAttribute('src', basePath + src.substring(1));
               }
             });
 
