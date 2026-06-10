@@ -138,8 +138,17 @@
               const src = img.getAttribute('src');
               if (!src) return;
               
-              if (src.includes('/assets/')) {
-                img.setAttribute('src', src.slice(src.indexOf('/assets/')));
+              // 确保图片路径以 /docsifyBlog/assets/ 开头
+              const basePath = '/docsifyBlog/';
+              const assetsPath = '/assets/';
+              
+              // 如果路径包含 /assets/ 但不是以 /docsifyBlog/assets/ 开头
+              if (src.includes(assetsPath) && !src.startsWith(basePath + 'assets/')) {
+                // 提取 /assets/ 后面的部分
+                const assetsIndex = src.indexOf(assetsPath);
+                const relativePath = src.substring(assetsIndex);
+                // 设置正确的绝对路径
+                img.setAttribute('src', basePath + relativePath.substring(1));
               }
             });
 
