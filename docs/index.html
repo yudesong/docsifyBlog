@@ -129,8 +129,10 @@
               const src = img.getAttribute('src');
               if (!src) return;
 
-              if (src.includes('/assets/')) {
-                img.setAttribute('src', src.slice(src.indexOf('/assets/')));
+              // 处理以 /assets/ 开头的绝对路径，确保在 GitHub Pages 子路径下正确解析
+              // 将 /assets/xxx 转换为 ./assets/xxx，使其相对于 docs 根目录
+              if (src.startsWith('/assets/')) {
+                img.setAttribute('src', '.' + src);
               }
             });
 
