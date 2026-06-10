@@ -22,7 +22,7 @@ title: "年轻人的第一个Flutter程序(1)"
 
 口说无凭，先上iPhone X上的演示图。
 
-![flutter_demo](/assets/images/flutter/flutter_demo.jpg)
+![flutter_demo](../assets/images/flutter/flutter_demo.jpg)
 
 此Demo共分为3个大页面，每个页面UI要点分布为
 1. Tab1
@@ -237,7 +237,7 @@ mainAxisAlignment和crossAxisAlignment有很多枚举值，表1举出了所有�
 
 表格看的不够直观，以Column为例上图，分别展示三个属性的效果。  
 
-![Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果](assets/images/flutter/column_main_axis_align.jpg)
+![Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果](/assets/images/flutter/column_main_axis_align.jpg)
 
 <center>Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果</center>
 

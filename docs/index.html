@@ -137,6 +137,7 @@
             document.querySelectorAll('.markdown-section img').forEach(function (img) {
               const src = img.getAttribute('src');
               if (!src) return;
+              
               if (src.includes('/assets/')) {
                 img.setAttribute('src', src.slice(src.indexOf('/assets/')));
               }
