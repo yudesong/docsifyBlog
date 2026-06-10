@@ -23,6 +23,7 @@
       repo: 'https://yudesong.github.io/docsifyBlog/',
       homepage: 'README.md',
       loadSidebar: true,
+      basePath: '/docsifyBlog/',
       auto2top: true,
       subMaxLevel: 3,
       maxLevel: 4,
@@ -69,8 +70,9 @@
               }
             );
             // 处理图片路径：将 /assets/ 转换为 ./assets/，确保在子路径下正确解析
+            // 匹配格式：![alt]( /assets/path ) 或 ![alt](/assets/path)
             content = content.replace(
-              /!\[([^\]]*)\]\(\/assets\/([^)]+)\)/g,
+              /!\[([^\]]*)\]\(\s*\/assets\/([^)]+?)\s*\)/g,
               function (_, alt, path) {
                 return '![' + alt + '](./assets/' + path + ')';
               }
