@@ -237,7 +237,7 @@ mainAxisAlignment和crossAxisAlignment有很多枚举值，表1举出了所有�
 
 表格看的不够直观，以Column为例上图，分别展示三个属性的效果。  
 
-![Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果](/assets/images/flutter/column_main_axis_align.jpg)
+![Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果](assets/images/flutter/column_main_axis_align.jpg)
 
 <center>Column中MainAxisAlignment取start、end、center、spaceBetween、spaceAround、spaceEvenly值时的效果</center>
 
