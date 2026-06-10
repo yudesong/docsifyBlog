@@ -68,6 +68,13 @@
                 return '](#/' + normalized + (hash || '') + ')';
               }
             );
+            // 处理图片路径：将 /assets/ 转换为 ./assets/，确保在子路径下正确解析
+            content = content.replace(
+              /!\[([^\]]*)\]\(\/assets\/([^)]+)\)/g,
+              function (_, alt, path) {
+                return '![' + alt + '](./assets/' + path + ')';
+              }
+            );
             return content;
           });
         },
