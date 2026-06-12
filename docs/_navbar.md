@@ -1,9 +1,4 @@
-﻿<!-- Root sidebar: use top tabs for full section navigation. -->
-
-* [Home](/README.md)
 * [Android](/android/framework/Android四大组件(1).md)
 * [Books](/design-pattern/design-pattern.md)
 * [Leetcode](/leetcode/index.md)
 * [Flutter](/flutter/dart_lang.md)
-* [Web建站目录](/website/Docsify%20建站指南.md)
-

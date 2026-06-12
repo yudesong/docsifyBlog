@@ -23,6 +23,7 @@
       repo: 'https://yudesong.github.io/docsifyBlog/',
       homepage: 'README.md',
       loadSidebar: true,
+      loadNavbar: true,
       auto2top: true,
       subMaxLevel: 3,
       maxLevel: 4,
@@ -66,14 +67,6 @@
               function (_, path, slash, hash) {
                 const normalized = path.endsWith('.md') ? path : path + '.md';
                 return '](#/' + normalized + (hash || '') + ')';
-              }
-            );
-            // 处理图片路径：将 /assets/ 转换为 ./assets/，确保在子路径下正确解析
-            // 匹配格式：![alt]( /assets/path ) 或 ![alt](/assets/path)
-            content = content.replace(
-              /!\[([^\]]*)\]\(\s*\/assets\/([^)]+?)\s*\)/g,
-              function (_, alt, path) {
-                return '![' + alt + '](./assets/' + path + ')';
               }
             );
             return content;
@@ -126,20 +119,50 @@
               const src = img.getAttribute('src');
               if (!src) return;
               
-              const basePath = '/docsifyBlog/';
-              
-              // 处理所有包含 /assets/ 的路径
-              // 将路径修正为相对于 GitHub Pages 根目录
+              const basePath = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+                ? '/'
+                : '/docsifyBlog/';
+
+              // 处理所有包含 /assets/ 的路径。本地使用 /assets/，线上 GitHub Pages 使用 /docsifyBlog/assets/。
               if (src.includes('/assets/')) {
-                // 提取 /assets/ 之后的部分
                 const assetsIndex = src.indexOf('/assets/');
-                const relativePath = src.substring(assetsIndex + 1); // 去掉开头的 /
+                const relativePath = src.substring(assetsIndex + 1);
                 img.setAttribute('src', basePath + relativePath);
               }
             });
 
             const sidebarRoot = document.querySelector('.sidebar-nav > ul');
             if (!sidebarRoot) return;
+
+            const sidebarNav = document.querySelector('.sidebar-nav');
+            if (sidebarNav && sidebarNav.dataset.routeBound !== 'true') {
+              sidebarNav.dataset.routeBound = 'true';
+              sidebarNav.addEventListener('click', function (event) {
+                const link = event.target.closest && event.target.closest('a[href^="#/"]');
+                if (!link || !sidebarNav.contains(link)) return;
+
+                const href = link.getAttribute('href');
+                if (!href || !href.startsWith('#/')) return;
+                if (link.classList.contains('section-link') || href.includes('?id=')) return;
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (window.location.hash !== href) {
+                  window.location.hash = href;
+                }
+                setTimeout(function () {
+                  window.scrollTo(0, 0);
+                  const content = document.querySelector('.content');
+                  if (content) {
+                    content.scrollTop = 0;
+                  }
+                }, 80);
+                if (window.innerWidth <= 768) {
+                  document.body.classList.remove('close');
+                }
+              }, true);
+            }
 
             const normalizeRoute = function (href) {
               if (!href) return '';

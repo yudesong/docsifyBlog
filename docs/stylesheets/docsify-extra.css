@@ -1,6 +1,7 @@
 :root {
   --theme-color: #42b983;
   --sidebar-width: 300px;
+  --navbar-height: 56px;
   --text-color: #34495e;
   --muted-color: #6f7b86;
   --border-color: rgba(0, 0, 0, 0.07);
@@ -21,14 +22,62 @@ body {
 
 .sidebar {
   width: var(--sidebar-width);
-  padding: 40px 0 24px;
+  padding: calc(var(--navbar-height) + 28px) 0 24px;
   background: var(--surface-color);
   border-right: 1px solid var(--border-color);
 }
 
 .content {
   left: var(--sidebar-width);
-  padding-top: 0;
+  padding-top: var(--navbar-height);
+}
+
+.app-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--sidebar-width);
+  z-index: 30;
+  height: var(--navbar-height);
+  margin: 0;
+  padding: 0 36px;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+.app-nav ul {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  gap: 6px;
+}
+
+.app-nav li {
+  margin: 0;
+}
+
+.app-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  color: var(--muted-color);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.app-nav a:hover,
+.app-nav a.active {
+  color: var(--theme-color);
+  background: rgba(66, 185, 131, 0.1);
+  text-decoration: none;
 }
 
 .app-name {
@@ -257,6 +306,21 @@ body.dark-mode .sidebar {
   border-right-color: var(--dark-border);
 }
 
+body.dark-mode .app-nav {
+  background: rgba(31, 34, 39, 0.96);
+  border-bottom-color: var(--dark-border);
+}
+
+body.dark-mode .app-nav a {
+  color: var(--dark-muted);
+}
+
+body.dark-mode .app-nav a:hover,
+body.dark-mode .app-nav a.active {
+  color: var(--theme-color);
+  background: rgba(66, 185, 131, 0.16);
+}
+
 body.dark-mode .app-name-link,
 body.dark-mode .markdown-section h1,
 body.dark-mode .markdown-section h2,
@@ -317,6 +381,18 @@ body.dark-mode .anchor span {
 
   .content {
     left: 0;
+    padding-top: var(--navbar-height);
+  }
+
+  .app-nav {
+    left: 0;
+    padding: 0 12px 0 56px;
+    overflow-x: auto;
+  }
+
+  .app-nav ul {
+    justify-content: flex-start;
+    min-width: max-content;
   }
 
   body.close .sidebar {
