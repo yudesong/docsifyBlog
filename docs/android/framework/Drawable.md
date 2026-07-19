@@ -24,7 +24,7 @@ Android中`Drawable`的类型共有十种：
 | Shape Drawable | ShapeDrawable | shape节点 |
 
 
-想要创建`AnimationDrawable`可以参考另外[Android动画](/android/framework/Android%E5%8A%A8%E7%94%BB/)一篇文章
+想要创建`AnimationDrawable`可以参考另外[Android动画](/android/framework/android-animation/)一篇文章
 
 [颜色资源](https://developer.android.com/guide/topics/resources/more-resources.html#Color)也可以在xml中作为一个`drawable`使用。比如，创建state list drawable时，可以使用`android:drawable`属性(`android:drawable="@color/green"`)引用颜色资源。
 

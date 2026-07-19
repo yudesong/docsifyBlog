@@ -416,7 +416,7 @@ public class DiskLruCacheWrapper implements DiskCache {
 里面果然wrap了一个`DiskLruCache`，该类主要是为`DiskLruCache`提供了一个根据`Key`生成key的`SafeKeyGenerator`以及写锁`DiskCacheWriteLocker`。  
 
 !!!! warning
-    **注意**：Glide中使用的LruCache与[Bitmap的缓存与加载](/android/framework/Bitmap%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8A%A0%E8%BD%BD/#21-lrucache)一文中提到的不一样；Glide使用的DiskLruCache虽然与文章中提到的DiskLruCache有一定的渊源，但不等同。
+    **注意**：Glide中使用的LruCache与[Bitmap的缓存与加载](/android/framework/bitmap-cache-and-loading/#21-lrucache)一文中提到的不一样；Glide使用的DiskLruCache虽然与文章中提到的DiskLruCache有一定的渊源，但不等同。
 
 OK，现在DiskCache的实现都准备好了，现在看看会在哪里调用factory的`build()`方法了。  
 在本文的开头，我们看到了`diskCacheFactory`只会传入`Engine`中。在`Engine`的构造方法中会被包装成为一个`LazyDiskCacheProvider`，在被需要的时候调用`getDiskCache()`方法，这样就会调用factory的`build()`方法返回一个`DiskCache`了。
@@ -697,9 +697,9 @@ public synchronized <R> LoadStatus load(...) {
 | transcodeClass | 最终要转换成的数据类型，根据`as`方法确定，加载本地res或者网络URL，都会调用`asDrawable`，所以为`Drawable` |
 | options | 如果没有设置过`transform`，此处会根据ImageView的scaleType默认指定一个KV，详见上一文2.2节 |
 
-显然，在多次加载同一个model的过程中，即使有稍许改动（比如View宽高等），Glide都不会认为这是同一个Key。此外，值得一提的是，此Key以及其他的Key覆盖`equals`、`hashCode()`、`toString()`方法的写法非常规范，详细可见[Effective-Java-第8、9、10条](/effective-java/chapter2/)。
+显然，在多次加载同一个model的过程中，即使有稍许改动（比如View宽高等），Glide都不会认为这是同一个Key。此外，值得一提的是，此Key以及其他的Key覆盖`equals`、`hashCode()`、`toString()`方法的写法非常规范，详细可见Effective-Java-第8、9、10条。
 
-回到`Engine.load`方法中，active状态的resource和memory cache状态的资源其实都是`DataSource.MEMORY_CACHE`状态，从缓存加载成功后的回调中可以看到。而且，加载出来的资源都是`EngineResource`对象，该对象的管理策略采用了[引用计数算法](/jvm/java-gc/#321)。该算法的特点是实现简单，判定效率也很高。
+回到`Engine.load`方法中，active状态的resource和memory cache状态的资源其实都是`DataSource.MEMORY_CACHE`状态，从缓存加载成功后的回调中可以看到。而且，加载出来的资源都是`EngineResource`对象，该对象的管理策略采用了引用计数算法。该算法的特点是实现简单，判定效率也很高。
 
 `EngineResource`类的关键代码如下：
 

@@ -382,7 +382,7 @@ public synchronized ExecutorService executorService() {
 从其特性来看，这类线程池适合执行大量耗时较少的任务。当整个线程池处理闲置状态时，线程池中的线程都会因为超时而被停止，这个时候`CachedThreadPool`之中实际上是没有线程的，它几乎不占用任何系统资源。  
 
 !!! info
-    关于线程池的更多知识，可以参考[Android中的线程池](/android/framework/Android%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/#3-android)
+    关于线程池的更多知识，可以参考[Android中的线程池](/android/framework/android-thread-and-thread-pool/#3-android)
 
 提交到线程池后，`AsyncCall.run`方法就会被调用，又因为`AsyncCall`继承了`NamedRunnable`，所以最后执行的是`AsyncCall.execute`方法：
 
@@ -493,7 +493,7 @@ Response getResponseWithInterceptorChain() throws IOException {
 将所有的拦截器保存在`interceptors`后，创建一个拦截器责任链`RealInterceptorChain`，并调用其`proceed`开始处理网络请求。
 
 !!! info
-    责任链模式的实例可以参考：[责任链模式(Chain of responsibility)](/design-pattern/chain-of-responsibility/)
+    责任链模式的实例可以参考：责任链模式(Chain of responsibility)
 
 **下面解释一下责任链模式是如何表现出来的？**  
 
@@ -824,7 +824,7 @@ public static List<Cookie> parseAll(HttpUrl url, Headers headers) {
 !!! quote "Comments"
     Serves requests from the cache and writes responses to the cache.
 
-首先需要注意的是，OkHttp中的Cache策略采用的是`DiskLruCache`，关于`DiskLruCache`可以参考[DiskLruCache](/android/framework/Bitmap%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8A%A0%E8%BD%BD/#22-disklrucache)。key的计算为：
+首先需要注意的是，OkHttp中的Cache策略采用的是`DiskLruCache`，关于`DiskLruCache`可以参考[DiskLruCache](/android/framework/bitmap-cache-and-loading/#22-disklrucache)。key的计算为：
 
 ```java
 ByteString.encodeUtf8(url.toString()).md5().hex()

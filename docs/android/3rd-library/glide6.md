@@ -744,7 +744,7 @@ registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(
 
 所以我们可以理解为，原本交给`HttpGlideUrlLoader.Factory()`处理的任务会交给`OkHttpUrlLoader.Factory()`处理。
 
-`OkHttpUrlLoader.Factory`的无参构造器会使用[DCL单例模式](/design-pattern/singleton/#33-double-check-lockdcl)创建一个`OkHttpClient()`对象，其`build`方法会返回一个`new OkHttpUrlLoader(client)`：
+`OkHttpUrlLoader.Factory`的无参构造器会使用DCL单例模式创建一个`OkHttpClient()`对象，其`build`方法会返回一个`new OkHttpUrlLoader(client)`：
 
 ```java
 public static class Factory implements ModelLoaderFactory<GlideUrl, InputStream> {

@@ -4248,7 +4248,7 @@ public Resource<Bitmap> decode(@NonNull ByteBuffer source, int width, int height
 }
 ```
 
-这里面使用的技巧也主要是使用的[Bitmap的加载](/android/framework/Bitmap%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8A%A0%E8%BD%BD/#1-bitmap)中提到的技巧。  
+这里面使用的技巧也主要是使用的[Bitmap的加载](/android/framework/bitmap-cache-and-loading/#1-bitmap)中提到的技巧。  
 不过在Glide中，除了设置了`BitmapFactory.Options`的`inJustDecodeBounds`和`inSampleSize`属性外，还会设置`inTargetDensity`、`inDensity`、`inScale`、`inPreferredConfig`、`inBitmap`属性。
 
 > 在计算各种值的时候，用到了Math里面ceil、floor、round函数。  

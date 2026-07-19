@@ -11,7 +11,7 @@ title: "Android三方库源码分析"
     - [Matrix-SQLiteLint解析<small>(待更新)</small>](/android/3rd-library/matrix-sqlitelint)
 - [最常用的PLT Hook框架：xHook](/android/3rd-library/xhook)
 - [AndResGuard资源混淆原理浅析](/android/3rd-library/andresguard)
-- [剖析hprof文件的两种主要裁剪流派](android/3rd-library/hprof-shrink)
+- [剖析hprof文件的两种主要裁剪流派](/android/3rd-library/hprof-shrink/)
 - [OkHttp-3.8.0](/android/3rd-library/okhttp/)
 - [Retrofit-2.3.0](/android/3rd-library/retrofit/)
 - [RxJava-2.1.13 & RxAndroid-2.0.2 & 部分使用例子](/android/3rd-library/rxjava&rxandroid/)

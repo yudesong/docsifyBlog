@@ -1,9 +1,9 @@
-﻿<!-- Root sidebar: use top tabs for full section navigation. -->
+<!-- Root sidebar: use top tabs for full section navigation. -->
 
 * [Home](/README.md)
-* [Android](/android/framework/Android四大组件(1).md)
-* [Books](/design-pattern/design-pattern.md)
-* [Leetcode](/leetcode/index.md)
+* [AI](/ai/vibe-coding-best-practices-guide.md)
+* [Android](/android/framework/android-four-components-activity.md)
+* [Programming Languages](/programming/java/java-foundation.md)
 * [Flutter](/flutter/dart_lang.md)
-* [Web建站目录](/website/Docsify%20建站指南.md)
-
+* [LeetCode](/leetcode/index.md)
+* [Web](/website/docsify-site-building-guide.md)

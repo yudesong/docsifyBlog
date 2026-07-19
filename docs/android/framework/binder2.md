@@ -7,7 +7,7 @@ tags:
 
 本博客Binder系列：
 
-1. [Binder简介](/android/paid/zsxq/week11-binder/)
+1. Binder简介
 2. [Binder深入理解——以MediaService为例](/android/framework/binder1-mediaservice/)，基于[Android深入浅出之Binder机制](http://www.cnblogs.com/innost/archive/2011/01/09/1931456.html)
 3. [Binder深入理解——罗老师系列](/android/framework/binder2/)，基于[Android进程间通信（IPC）机制Binder简要介绍和学习计划](https://blog.csdn.net/luoshengyang/article/details/6618363)
 
@@ -5063,4 +5063,4 @@ sp<IBinder> ProcessState::getStrongProxyForHandle(int32_t handle)
 
 有了这个BpMediaPlayerService这个远程接口之后，MediaPlayer就可以调用MediaPlayerService的服务了。
 
-Framework里面的Binder总算把自个完全整懵了。Java层的Binder可以参考[IPC机制——Binder](/android/framework/IPC机制/#33-binder)。
+Framework里面的Binder总算把自个完全整懵了。Java层的Binder可以参考[IPC机制——Binder](/android/framework/ipc-mechanism/#33-binder)。

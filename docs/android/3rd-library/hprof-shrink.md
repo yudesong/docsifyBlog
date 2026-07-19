@@ -782,6 +782,6 @@ if (write_len > 0) {
 
 
 [^1]:[Android开发高手课：04 | 内存优化（下）：内存优化这件事，应该从哪里着手？](/android/paid/master/memory_2)
-[^2]:[访问者模式(Visitor)](/design-pattern/visitor/)
-[^3]:[Bitmap的缓存与加载](/android/framework/Bitmap%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%8E%E5%8A%A0%E8%BD%BD/)
+[^2]:访问者模式(Visitor)
+[^3]:[Bitmap的缓存与加载](/android/framework/bitmap-cache-and-loading/)
 [^4]:[美团Probe](https://tech.meituan.com/2019/11/14/crash-oom-probe-practice.html)
