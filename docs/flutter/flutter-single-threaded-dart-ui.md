@@ -15,7 +15,7 @@ Dart 是一门单线程编程语言。对于平时用 iOS 的同学，首先可�
 我们先来看看阻塞IO是什么样的：
 
 ```arduino
-arduino 代码解读复制代码String text = io.read(buffer); //阻塞等待
+String text = io.read(buffer); //阻塞等待
 ```
 
 > 注： IO 模型是操作系统层面的，这一小节的代码都是伪代码，只是为了方便理解。
@@ -36,7 +36,7 @@ arduino 代码解读复制代码String text = io.read(buffer); //阻塞等待
 如果进行IO的时候不用阻塞，那情况就不一样了：
 
 ```
-scss 代码解读复制代码while(true){
+while(true){
   for(io in io_array){
       status = io.read(buffer);// 不管有没有数据都立即返回
       if(status == OK){
@@ -51,7 +51,7 @@ scss 代码解读复制代码while(true){
 为了进一步解决这个问题，人们设计了IO多路转接（IO multiplexing），可以对多个IO监听和设置等待时间：
 
 ```
-scss 代码解读复制代码while(true){
+while(true){
     //如果其中一路IO有数据返回，则立即返回；如果一直没有，最多等待不超过timeout时间
     status = select(io_array, timeout);
     if(status  == OK){
@@ -69,7 +69,7 @@ scss 代码解读复制代码while(true){
 答案就是异步IO了：
 
 ```javascript
-javascript 代码解读复制代码io.async_read((data) => {
+io.async_read((data) => {
   // dosomething
 });
 ```
@@ -96,7 +96,7 @@ Event Loop 完整版的流程图
 微任务是由 `scheduleMicroTask` 建立的
 
 ```
-scss 代码解读复制代码scheduleMicrotask(() => print('This is a microtask'));
+scheduleMicrotask(() => print('This is a microtask'));
 ```
 
 不过，一般的异步任务通常也很少必须要在事件队列前完成，所以也不需要太高的优先级，因此我们通常很少会直接用到微任务队列，就连 Flutter 内部，也只有 7 处用到了而已（比如，手势识别、文本输入、滚动视图、保存页面效果等需要高优执行任务的场景）。
@@ -114,14 +114,14 @@ Dart 为 Event Queue 的任务建立提供了一层封装，叫作 Future。从�
 - 首先，当前Isolate创建一个ReceivePort对象，并获得对应的SendPort对象；
 
 ```
-ini 代码解读复制代码 var receivePort = ReceivePort();
+ var receivePort = ReceivePort();
  var sendPort = receivePort.sendPort;
 ```
 
 - 其次，创建一个新的Isolate，并实现新Isolate要执行的异步任务，同时，将当前Isolate的SendPort对象传递给新的Isolate，以便新Isolate使用这个SendPort对象向原来的Isolate发送事件；
 
 ```csharp
-csharp 代码解读复制代码// 调用Isolate.spawn创建一个新的Isolate
+// 调用Isolate.spawn创建一个新的Isolate
 // 这是一个异步操作，因此使用await等待执行完毕
 var anotherIsolate = await Isolate.spawn(otherIsolateInit, receivePort.sendPort);
 
@@ -136,7 +136,7 @@ void otherIsolateInit(SendPort sendPort) async {
 - 然后，调用当前Isolate#receivePort的listen方法监听新的Isolate传递过来的数据。Isolate之间什么数据类型都可以传递，不必做任何标记
 
 ```lua
-lua 代码解读复制代码receivePort.listen((date) {
+receivePort.listen((date) {
     print("Isolate 1 接受消息：data = $date");
 });
 ```
@@ -144,7 +144,7 @@ lua 代码解读复制代码receivePort.listen((date) {
 - 最后，消息传递完毕，关闭新创建的Isolate。
 
 ```
-ini 代码解读复制代码anotherIsolate?.kill(priority: Isolate.immediate);
+anotherIsolate?.kill(priority: Isolate.immediate);
 anotherIsolate =null;
 ```
 
@@ -157,7 +157,7 @@ anotherIsolate =null;
 在Flutter中，使用Future来执行耗时操作，表示在未来会返回某个值，并可以使用then（）方法和catchError（）来注册callback来监听Future的处理结果。
 
 ```
-ini 代码解读复制代码Future<Response> respFuture = http.get('https://example.com'); //发起请求
+Future<Response> respFuture = http.get('https://example.com'); //发起请求
 respFuture.then((response) { //成功，匿名函数
   if (response.statusCode == 200) {
     var data = reponse.data;
@@ -196,7 +196,7 @@ Future 对象封装了Dart 的异步操作，它有未完成（uncompleted）和
 通过Future的默认构造方法可以创建一个Future对象,。默认构造方法的签名如下
 
 ```
-scss 代码解读复制代码factory Future(FutureOr<T> computation()) {
+factory Future(FutureOr<T> computation()) {
     _Future<T> result = new _Future<T>();
     Timer.run(() {
       try {
@@ -216,7 +216,7 @@ scss 代码解读复制代码factory Future(FutureOr<T> computation()) {
 ### 2、Future.micortask构造方法
 
 ```
-scss 代码解读复制代码factory Future.microtask(FutureOr<T> computation()) {
+factory Future.microtask(FutureOr<T> computation()) {
     _Future<T> result = new _Future<T>();
     scheduleMicrotask(() {
       try {
@@ -232,7 +232,7 @@ scss 代码解读复制代码factory Future.microtask(FutureOr<T> computation())
 通过 `scheduleMicrotask` 方法将computation函数添加到microtask队列中，优先于event队列执行。
 
 ```
-scss 代码解读复制代码    Future(() {
+    Future(() {
       print("default fauture");
     });
 
@@ -248,7 +248,7 @@ scss 代码解读复制代码    Future(() {
 ### 3、Future.sync构造方法
 
 ```javascript
-javascript 代码解读复制代码factory Future.sync(FutureOr<T> computation()) {}
+factory Future.sync(FutureOr<T> computation()) {}
 ```
 
 将会在当前task执行computation计算，而不是将计算过程添加到任务队列中。
@@ -258,12 +258,12 @@ javascript 代码解读复制代码factory Future.sync(FutureOr<T> computation()
 创建一个返回指定value值的Future
 
 ```javascript
-javascript 代码解读复制代码factory Future.value([FutureOr<T>? value]) {
+factory Future.value([FutureOr<T>? value]) {
     return new _Future<T>.immediate(value == null ? value as T : value);
 ```
 
 ```
-ini 代码解读复制代码var future = Future.value(1);
+var future = Future.value(1);
 var future1 = Future.value('1');
 print(future);
 print(future1);
@@ -274,7 +274,7 @@ print(future1);
 ### 5、Future.error构造方法
 
 ```javascript
-javascript 代码解读复制代码factory Future.error(Object error, [StackTrace? stackTrace]) {}
+factory Future.error(Object error, [StackTrace? stackTrace]) {}
 ```
 
 通过 `error对象` 和可选的stackTrace创建Future,可以使用该方法创建个一个状态为failed的Future对象。
@@ -282,7 +282,7 @@ javascript 代码解读复制代码factory Future.error(Object error, [StackTrac
 ### 6、Future.delayed（）构造方法
 
 ```javascript
-javascript 代码解读复制代码factory Future.delayed(Duration duration, [FutureOr<T> computation()?]) {
+factory Future.delayed(Duration duration, [FutureOr<T> computation()?]) {
     if (computation == null && !typeAcceptsNull<T>()) {
       throw ArgumentError.value(
           null, "computation", "The type parameter is not nullable");
@@ -306,7 +306,7 @@ javascript 代码解读复制代码factory Future.delayed(Duration duration, [Fu
 创建一个延迟执行的future。 例如下面的例子，利用Future延迟两秒后可以打印出字符串。
 
 ```
-ini 代码解读复制代码var futureDelayed = Future.delayed(Duration(seconds: 2), () {
+var futureDelayed = Future.delayed(Duration(seconds: 2), () {
   print("Future.delayed");
   return 2;
 });
@@ -317,7 +317,7 @@ ini 代码解读复制代码var futureDelayed = Future.delayed(Duration(seconds:
 ### 1、wait
 
 ```csharp
-csharp 代码解读复制代码static Future<List<T>> wait<T>(Iterable<Future<T>> futures,
+static Future<List<T>> wait<T>(Iterable<Future<T>> futures,
       {bool eagerError = false, void cleanUp(T successValue)?}){}
 ```
 
@@ -331,7 +331,7 @@ csharp 代码解读复制代码static Future<List<T>> wait<T>(Iterable<Future<T>
 ### 2、forEach
 
 ```csharp
-csharp 代码解读复制代码static Future forEach<T>(Iterable<T> elements, FutureOr action(T element)) {}
+static Future forEach<T>(Iterable<T> elements, FutureOr action(T element)) {}
 ```
 
 `forEach` 静态方法可以遍历 `Iterable` 中的每个元素执行一个操作，如果遍历操作返回的是Future对象，则在该Future完成后再进行下一次遍历，全部完成后返回null。如果在某一次操作中发生异常，会停止遍历，最终的Future的状态为failed。
@@ -339,7 +339,7 @@ csharp 代码解读复制代码static Future forEach<T>(Iterable<T> elements, Fu
 比如下面的例子，根据{1,2,3}创建3个延迟对应秒数的Future。执行结果为1秒后打印1，再过2秒打印2，再过3秒打印3，总时间为6秒。
 
 ```dart
-dart 代码解读复制代码Future.forEach({1,2,3}, (num){
+Future.forEach({1,2,3}, (num){
       return Future.delayed(Duration(seconds: num),(){print(num);});
     });
 ```
@@ -349,7 +349,7 @@ dart 代码解读复制代码Future.forEach({1,2,3}, (num){
 ### 3、any
 
 ```swift
-swift 代码解读复制代码static Future<T> any<T>(Iterable<Future<T>> futures) {}
+static Future<T> any<T>(Iterable<Future<T>> futures) {}
 ```
 
 返回的是第一个执行完成的future的结果，不会管这个结果是正确的还是error的
@@ -359,7 +359,7 @@ swift 代码解读复制代码static Future<T> any<T>(Iterable<Future<T>> future
 重复性地执行某一个动作，直到返回false或者Future，退出循环
 
 ```javascript
-javascript 代码解读复制代码static Future doWhile(FutureOr<bool> action()) {}
+static Future doWhile(FutureOr<bool> action()) {}
 ```
 
 使用场景:适用于一些需要递归操作的场景。
@@ -367,7 +367,7 @@ javascript 代码解读复制代码static Future doWhile(FutureOr<bool> action()
 例如下面的例子，生成一个随机数进行等待，直到十秒之后，操作结束。
 
 ```dart
-dart 代码解读复制代码void futureDoWhile(){
+void futureDoWhile(){
   var random = new Random();
   var totalDelay = 0;
   Future
@@ -407,11 +407,11 @@ null
 创建完成Future对象后，可以通过then方法接收Future的结果。
 
 ```csharp
-csharp 代码解读复制代码Future<R> then<R>(FutureOr<R> onValue(T value), {Function onError});
+Future<R> then<R>(FutureOr<R> onValue(T value), {Function onError});
 ```
 
 ```
-ini 代码解读复制代码Future<Response> respFuture = http.get('https://example.com'); //发起请求
+Future<Response> respFuture = http.get('https://example.com'); //发起请求
 respFuture.then((response) { //成功，匿名函数
   if (response.statusCode == 200) {
     var data = reponse.data;
@@ -426,7 +426,7 @@ respFuture.then((response) { //成功，匿名函数
 如果Future内的函数执行发生异常，可以通过Future.catchError来处理异常：
 
 ```
-scss 代码解读复制代码Future<void> fetchUserOrder() {
+Future<void> fetchUserOrder() {
   return Future.delayed(Duration(seconds: 3),
                                               () => throw Exception('Logout failed: user ID is invalid'));
 }
@@ -439,7 +439,7 @@ void main() {
 输出结果：
 
 ```
-vbnet 代码解读复制代码Fetching user order...
+Fetching user order...
 Exception: Logout failed: user ID is invalid
 ```
 
@@ -448,13 +448,13 @@ Exception: Logout failed: user ID is invalid
 Future.whenComplete总是在Future完成后调用，不管Future的结果是正确的还是错误的。
 
 ```arduino
-arduino 代码解读复制代码Future<T> whenComplete(FutureOr<void> action());
+Future<T> whenComplete(FutureOr<void> action());
 ```
 
 ### 4、timeout方法
 
 ```
-r 代码解读复制代码Future<T> timeout(Duration timeLimit, {FutureOr<T> onTimeout()})
+Future<T> timeout(Duration timeLimit, {FutureOr<T> onTimeout()})
 ```
 
 timeout方法创建一个新的Future对象，接收一个Duration类型的timeLimit参数来设置超时时间。如果原Future在超时之前完成，最终的结果就是该原Future的值；如果达到超时时间后还未完成，就会产生TimeoutException异常。 该方法有一个onTimeout可选参数，如果设置了该参数，当发生超时时会调用该函数，该函数的返回值为Future的新的值，而不会产生TimeoutException。
@@ -468,7 +468,7 @@ timeout方法创建一个新的Future对象，接收一个Duration类型的timeL
 - 1. 最后把用户信息缓存到本机。 接口定义：
 
 ```javascript
-javascript 代码解读复制代码Future<String> login(String name,String password){
+Future<String> login(String name,String password){
   //登录
 }
 Future<User> fetchUserInfo(String token){
@@ -482,7 +482,7 @@ Future saveUserInfo(User user){
 用Future大概可以这样写：
 
 ```
-scss 代码解读复制代码login('name','password')
+login('name','password')
 .then((token) => fetchUserInfo(token))
  .then((user) => saveUserInfo(user));
 ```
@@ -490,7 +490,7 @@ scss 代码解读复制代码login('name','password')
 换成 `async 和await` 则可以这样：
 
 ```csharp
-csharp 代码解读复制代码void doLogin() async {
+void doLogin() async {
   String token = await login('name','password'); //await 必须在 async 函数体内
   User user = await fetchUserInfo(token);
   await saveUserInfo(user);
@@ -502,7 +502,7 @@ csharp 代码解读复制代码void doLogin() async {
 await的代码发生异常，捕获方式跟同步调用函数一样：
 
 ```csharp
-csharp 代码解读复制代码void doLogin() async {
+void doLogin() async {
   try {
     var token = await login('name','password');
     var user = await fetchUserInfo(token);

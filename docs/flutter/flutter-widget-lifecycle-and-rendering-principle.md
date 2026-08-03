@@ -13,7 +13,7 @@ flutter生命周期其实就是Widget的生命周期，生命周期的回调函�
 StatelessWidget比较简单，主要有 `构造方法` 和 `build方法`
 
 ```scala
-scala 代码解读复制代码class MyStatelessWidget extends StatelessWidget {
+class MyStatelessWidget extends StatelessWidget {
   final String title;
   MyStatelessWidget({this.title}){
     print('构造函数被调用了!');
@@ -57,7 +57,7 @@ StatefulWidget就有点复杂了，写一个StatefulWidget的时候，系统默�
 我们现在随便写一个 `StatefulWidget` 控件
 
 ```scala
-scala 代码解读复制代码class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
 其实上面包含了初始化阶段的所有内容了
 
 ```scala
-scala 代码解读复制代码class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   HomePage(){
     print('Widget的构造方法');
   }
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
 我们在上面 `State` 方法里面重写 `didChangeDependencies`
 
 ```
-scss 代码解读复制代码@override
+@override
   void didChangeDependencies() {
     print('didChangeDependencies');
     super.didChangeDependencies();
@@ -130,7 +130,7 @@ scss 代码解读复制代码@override
 我们创建一个 `StfulItem`
 
 ```scala
-scala 代码解读复制代码class StfulItem extends StatefulWidget {
+class StfulItem extends StatefulWidget {
   final title;
   StfulItem(this.title, {Key key}) : super(key: key);
   @override
@@ -157,7 +157,7 @@ class _StfulItemState extends State<StfulItem> {
 ```
 
 ```
-scss 代码解读复制代码class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   List<Widget> items = [    StfulItem(      'aaaaa',    ),    StfulItem(      'bbbbb',    ),    StfulItem(      'ccccc',    ),  ];
   _HomePageState(){
     print('State的构造方法');
@@ -204,7 +204,7 @@ scss 代码解读复制代码class _HomePageState extends State<HomePage> {
 ### 3、销毁（从渲染树种移除）
 
 ```typescript
-typescript 代码解读复制代码//当State对象从渲染树中移出的时候,就会调用!即将销毁!
+//当State对象从渲染树中移出的时候,就会调用!即将销毁!
   @override
   void deactivate() {
     super.deactivate();
@@ -230,7 +230,7 @@ typescript 代码解读复制代码//当State对象从渲染树中移出的时�
 Flutter 是 UI 框架，Flutter 内一切皆 Widget ，每个 Widget 状态都代表了一帧，Widget 是不可变的。 那么 Widget 是怎么工作的呢？
 
 ```scala
-scala 代码解读复制代码class LifeCyclePage extends StatelessWidget {
+class LifeCyclePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -284,7 +284,7 @@ Widget 和我们以前的布局概念不一样，因为 Widget 是不可变的�
 我们进入源码查看继承关系， 点击 `Column`
 
 ```
-ini 代码解读复制代码Column({
+Column({
     Key key,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
     MainAxisSize mainAxisSize = MainAxisSize.max,
@@ -299,7 +299,7 @@ ini 代码解读复制代码Column({
 我们点击 `super()` 查看 `Column` 的父类
 
 ```kotlin
-kotlin 代码解读复制代码Flex({
+Flex({
     Key key,
     @required this.direction,
     this.mainAxisAlignment = MainAxisAlignment.start,
@@ -320,7 +320,7 @@ kotlin 代码解读复制代码Flex({
 我们点击我们点击 `super()` 查看 `Flex` 的父类
 
 ```scala
-scala 代码解读复制代码abstract class MultiChildRenderObjectWidget extends RenderObjectWidget {
+abstract class MultiChildRenderObjectWidget extends RenderObjectWidget {
 
   MultiChildRenderObjectWidget({ Key key, this.children = const <Widget>[] })
       }()), // https://github.com/dart-lang/sdk/issues/29276
@@ -338,7 +338,7 @@ scala 代码解读复制代码abstract class MultiChildRenderObjectWidget extend
 我们点击 `MultiChildRenderObjectElement` ，进入到了 `RenderObjectElement`
 
 ```scala
-scala 代码解读复制代码class MultiChildRenderObjectElement extends RenderObjectElement {
+class MultiChildRenderObjectElement extends RenderObjectElement {
     MultiChildRenderObjectElement(MultiChildRenderObjectWidget widget)
     : assert(!debugChildrenHaveDuplicateKeys(widget, widget.children)),
       super(widget);
@@ -348,7 +348,7 @@ scala 代码解读复制代码class MultiChildRenderObjectElement extends Render
 我们点击 `super`
 
 ```scala
-scala 代码解读复制代码abstract class RenderObjectElement extends Element {}
+abstract class RenderObjectElement extends Element {}
 ```
 
 我们找到了最底层的 `Element`
@@ -362,7 +362,7 @@ Flutter会调用 `mount` 方法，调用 `createRanderObject` 方法。
 我们随便创建一个 `StatelessWidget`
 
 ```scala
-scala 代码解读复制代码class MyStatelessWidget extends StatelessWidget {
+class MyStatelessWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -375,7 +375,7 @@ scala 代码解读复制代码class MyStatelessWidget extends StatelessWidget {
 我们点击 `StatelessWidget` 进入查看源码
 
 ```scala
-scala 代码解读复制代码abstract class StatelessWidget extends Widget {
+abstract class StatelessWidget extends Widget {
   const StatelessWidget({ Key key }) : super(key: key);
 
   StatelessElement createElement() => StatelessElement(this);
@@ -390,7 +390,7 @@ scala 代码解读复制代码abstract class StatelessWidget extends Widget {
 我们点击 `StatelessElement` 继续查看
 
 ```scala
-scala 代码解读复制代码class StatelessElement extends ComponentElement {
+class StatelessElement extends ComponentElement {
   StatelessElement(StatelessWidget widget) : super(widget);
 
   @override
@@ -413,7 +413,7 @@ scala 代码解读复制代码class StatelessElement extends ComponentElement {
 - 2、主要就是调用build方法，将自己（Element）传出去，这个 `this` 就是 `Element`
 
 ```
-less 代码解读复制代码  @override
+  @override
   Widget build() => widget.build(this);
 ```
 
@@ -424,7 +424,7 @@ less 代码解读复制代码  @override
 我们随便创建一个 `StatefulWidget`
 
 ```scala
-scala 代码解读复制代码class MyStatefulWidget extends StatefulWidget {
+class MyStatefulWidget extends StatefulWidget {
   @override
   _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
 }
@@ -440,7 +440,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 我们点击 `StatefulWidget` 进入源码查看
 
 ```scala
-scala 代码解读复制代码abstract class StatefulWidget extends Widget {
+abstract class StatefulWidget extends Widget {
   const StatefulWidget({ Key key }) : super(key: key);
 
   @override
@@ -457,7 +457,7 @@ scala 代码解读复制代码abstract class StatefulWidget extends Widget {
 我们点击 `StatefulElement` 进入源码查看
 
 ```scala
-scala 代码解读复制代码class StatefulElement extends ComponentElement {
+class StatefulElement extends ComponentElement {
   StatefulElement(StatefulWidget widget)
       : _state = widget.createState(),
 

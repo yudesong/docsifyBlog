@@ -20,7 +20,7 @@ Navigator是一个路由管理的widget，它通过一个栈来管理一个路�
 为了说明Flutter是如何实现路由跳转的，我们创建两个页面：NewRoute.dart和main.dart。 其中，NewRoute.dart的源码如下：
 
 ```bash
-代码解读复制代码import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 class SecondPage extends StatelessWidget {
@@ -50,7 +50,7 @@ class SecondPage extends StatelessWidget {
 新路由继承自StatelessWidget，界面很简单，在页面中间显示一句"This is new route"。然后，修改main.dart的源码如下：
 
 ```bash
-代码解读复制代码import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_demo/SecondPage.dart';
 
 void main() {
@@ -118,7 +118,7 @@ MaterialPageRoute继承自PageRoute类，PageRoute类是一个抽象类，表示
 我们使用MaterialPageRoute来完成路由跳转时，MaterialPageRoute构造函数提供了几个的，参数，格式如下：
 
 ```bash
-代码解读复制代码 MaterialPageRoute({
+ MaterialPageRoute({
     WidgetBuilder builder,
     RouteSettings settings,
     bool maintainState = true,
@@ -148,7 +148,7 @@ Navigator是Flutter应用开发中的一个路由管理的widget，它通过一�
 下边是 Navigator.push 的源码，入参的 Route 对象中有一个 RouteSettings 成员变量，我们可以在构造 Route 对象的时候将需要传递的参数放在 RouteSettings 中。
 
 ```bash
-代码解读复制代码@optionalTypeArgs
+@optionalTypeArgs
 static Future<T> push<T extends Object>(BuildContext context, Route<T> route) {
   return Navigator.of(context).push(route);
 }
@@ -157,7 +157,7 @@ static Future<T> push<T extends Object>(BuildContext context, Route<T> route) {
 如果涉及到传递参数，那么我们可以将参数放在 SecondScreen 的构造函数中，也可以放在构造的 MaterialPageRoute 的 RouteSettings 中。
 
 ```bash
-代码解读复制代码Navigator.push(
+Navigator.push(
   context,
   new MaterialPageRoute(builder: (context) => new SecondScreen()),
 ).then((data){
@@ -171,7 +171,7 @@ static Future<T> push<T extends Object>(BuildContext context, Route<T> route) {
 pushNamed方式的实现最终调用的也是 push 方法，这中方法直接暴露了参数 Object arguments ，源码如下：
 
 ```bash
-代码解读复制代码@optionalTypeArgs
+@optionalTypeArgs
 static Future<T> pushNamed<T extends Object>(
   BuildContext context,
   String routeName, {
@@ -191,7 +191,7 @@ Future<T> pushNamed<T extends Object>(
 使用pushNamed方式时，需要将路由注册到路由表中，例如：
 
 ```bash
-代码解读复制代码Navigator.of(context)
+Navigator.of(context)
   .pushNamed(
     '/route1',
     arguments: {
@@ -210,7 +210,7 @@ pop操作将栈顶路由出栈，入参为一个 object 类型的对象，出参
 pop的源码如下：
 
 ```bash
-代码解读复制代码@optionalTypeArgs
+@optionalTypeArgs
 static bool pop<T extends Object>(BuildContext context, [ T result ]) {
   return Navigator.of(context).pop<T>(result);
 }
@@ -219,19 +219,19 @@ static bool pop<T extends Object>(BuildContext context, [ T result ]) {
 pop的使用非常简单，例如：
 
 ```bash
-代码解读复制代码Navigator.of(context).pop("");  //可以传递参数
+Navigator.of(context).pop("");  //可以传递参数
 ```
 
 两个页面之间跳转，如果涉及到参数的传递，可以使用下面的方式：
 
 ```bash
-代码解读复制代码Navigator.of(context).pushNamed('/route1', arguments: {"name": 'hello'});
+Navigator.of(context).pushNamed('/route1', arguments: {"name": 'hello'});
 ```
 
 获取参数时，可以使用下面的方式：
 
 ```bash
-代码解读复制代码class Page extends StatelessWidget{
+class Page extends StatelessWidget{
   String name;
   @override
   Widget build(BuildContext context) {
@@ -259,7 +259,7 @@ pop的使用非常简单，例如：
 要想使用命名路由，我们必须先提供并注册一个路由表（routing table），这样应用程序才知道哪个名称与哪个路由Widget对应。路由表的定义如下：
 
 ```bash
-代码解读复制代码Map<String, WidgetBuilder> routes;
+Map<String, WidgetBuilder> routes;
 ```
 
 它是一个Map， key 为路由的名称，是个字符串；value是个builder回调函数，用于生成相应的路由Widget。我们在通过路由名称入栈新路由时，应用会根据路由名称在路由表中找到对应的WidgetBuilder回调函数，然后调用该回调函数生成路由widget并返回。
@@ -267,7 +267,7 @@ pop的使用非常简单，例如：
 例如，我们在创建 MaterialApp 的时候就有一个 routes 构造参数：
 
 ```bash
-代码解读复制代码class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -288,7 +288,7 @@ pop的使用非常简单，例如：
 Flutter的路由注册方式比较简单，我们回到之前“计数器”的示例，然后在MyApp类的build方法中找到MaterialApp，添加routes属性，代码如下：
 
 ```bash
-代码解读复制代码return new MaterialApp(
+return new MaterialApp(
   title: 'Flutter Demo',
   theme: new ThemeData(
     primarySwatch: Colors.blue,
@@ -304,13 +304,13 @@ Flutter的路由注册方式比较简单，我们回到之前“计数器”的�
 这样，使用routes的方式我们就完成了路由表的注册。现在，我们就可以通过路由名称来打开新的路由。pushNamed跳转的格式如下：
 
 ```bash
-代码解读复制代码Future pushNamed(BuildContext context, String routeName,{Object arguments})
+Future pushNamed(BuildContext context, String routeName,{Object arguments})
 ```
 
 Navigator 除了pushNamed方法，还有pushReplacementNamed等其他管理命名路由的方法，读者可以自行查看API文档。接下来我们通过路由名来打开新的路由页，修改FlatButton的onPressed回调代码：
 
 ```bash
-代码解读复制代码onPressed: () {
+onPressed: () {
   Navigator.pushNamed(context, "new_page");
   //Navigator.push(context,
   //  new MaterialPageRoute(builder: (context) {
@@ -324,7 +324,7 @@ Navigator 除了pushNamed方法，还有pushReplacementNamed等其他管理命�
 在Flutter最初的版本中，命名路由是不能进行传递参数的，后来才支持了参数。例如，下面展示命名路由如何传递并获取路由参数，首先，注册一个路由：
 
 ```bash
-代码解读复制代码routes:{
+routes:{
    "new_page":(context)=>EchoRoute(),
   } ,
 ```
@@ -332,7 +332,7 @@ Navigator 除了pushNamed方法，还有pushReplacementNamed等其他管理命�
 然后，在路由页通过RouteSetting对象获取路由参数，例如：
 
 ```bash
-代码解读复制代码class EchoRoute extends StatelessWidget {
+class EchoRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -346,6 +346,6 @@ Navigator 除了pushNamed方法，还有pushReplacementNamed等其他管理命�
 然后，在打开路由时传递参数：
 
 ```bash
-代码解读复制代码Navigator.of(context).pushNamed("new_page", arguments: "hi");
+Navigator.of(context).pushNamed("new_page", arguments: "hi");
 ```
 

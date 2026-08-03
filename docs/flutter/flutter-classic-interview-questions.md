@@ -1,10 +1,8 @@
 ---
-title: 2023flutter经典题解
+title: Flutter 基础部分(一)
 url: https://juejin.cn/post/7208722414598717498?from=search-suggest
 publishedTime: 2023-03-10T10:45:06+08:00
 ---
-
-### 前言
 
 Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Android、iOS和Web平台上构建高质量的原生用户界面。在过去的一年里，Flutter的更新频率是相当的快，也有很多的公司开始使用它来进行跨平台应用开发，可以说，将Flutter称为2019年最流行的跨平台技术也不为过。
 
@@ -12,7 +10,7 @@ Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Andro
 
 在国内，除了阿里、腾讯、美团等大厂外，国内很多的中小团队也开始使用Flutter来作为移动应用开发的首选，并且很多公司在移动招聘方面也要求具有Flutter开发的背景。Flutter 的面试题主要分为两个Dart和Flutter部分，下面是一些常见的面试题。
 
-#### Dart
+### Dart 基础
 
 **1. Dart 当中的 「..」表示什么意思？** 
 
@@ -88,7 +86,7 @@ mixins的对象是类，mixins绝不是继承，也不是接口，而是一种�
 
 ---
 
-### Flutter
+### Flutter 基础部分
 
 **1. 请简单介绍下Flutter框架，以及它的优缺点？** 
 

@@ -15,7 +15,7 @@ InheritedWidget是Flutter中非常重要的一个功能型Widget，它可以高�
 点击按钮，count+1，在最下面的一个widget上面显示
 
 ```scala
-scala 代码解读复制代码class InheritedDemo extends StatefulWidget {
+class InheritedDemo extends StatefulWidget {
   @override
   _InheritedDemoState createState() => _InheritedDemoState();
 }
@@ -76,7 +76,7 @@ Flutter 给我们提供了一个InheritedWidget组件，来帮助我们完成上
 首先我们需要定义一个继承InheritedWidget的widget MyData
 
 ```scala
-scala 代码解读复制代码class MyData extends InheritedWidget {
+class MyData extends InheritedWidget {
   MyData({this.data, Widget child}) : super(child: child);
 
   final int data; //需要在子树中共享的数据，保存点击次数
@@ -99,7 +99,7 @@ scala 代码解读复制代码class MyData extends InheritedWidget {
 然后使用 `MyData` 包裹整个widget
 
 ```scala
-scala 代码解读复制代码class InheritedDemo extends StatefulWidget {
+class InheritedDemo extends StatefulWidget {
   @override
   _InheritedDemoState createState() => _InheritedDemoState();
 }
@@ -174,7 +174,7 @@ Flutter中将这种由子向父的传递通知的机制称为通知冒泡（Noti
 ### 1、定义一个通知类，要继承自Notification类
 
 ```scala
-scala 代码解读复制代码class MyNotification extends Notification {
+class MyNotification extends Notification {
   MyNotification(this.msg);
   final String msg;
 }
@@ -185,7 +185,7 @@ scala 代码解读复制代码class MyNotification extends Notification {
 Notification有一个dispatch(context)方法，它是用于分发通知的，我们说过context实际上就是操作Element的一个接口，它与Element树上的节点是对应的，通知会从context对应的Element节点向上冒泡。
 
 ```scala
-scala 代码解读复制代码//子widget
+//子widget
 class ChildNotificationWidget extends StatefulWidget {
   @override
   _ChildNotificationWidgetState createState() => _ChildNotificationWidgetState();
@@ -239,14 +239,14 @@ class _parentNotificationWidgetState extends State<parentNotificationWidget> {
 接下来，我们通过一个跨页面通信的例子，来看一下事件总线的具体使用方法。需要注意的是，EventBus 是一个第三方插件，因此我们需要在 pubspec.yaml 文件中声明它：
 
 ```yaml
-yaml 代码解读复制代码dependencies:
+dependencies:
   event_bus: ^1.1.1
 ```
 
 本节我们实现一个简单的全局事件总线，我们使用单例模式，代码如下：
 
 ```
-ini 代码解读复制代码//订阅者回调签名
+//订阅者回调签名
 typedef void EventCallback(arg);
 
 class EventBus {
@@ -301,7 +301,7 @@ var bus = new EventBus();
 上面代码转载自： [事件总线](https://link.juejin.cn/?target=https%3A%2F%2Fbook.flutterchina.club%2Fchapter8%2Feventbus.html "https://book.flutterchina.club/chapter8/eventbus.html")
 
 ```scala
-scala 代码解读复制代码class EventBusPage extends StatefulWidget {
+class EventBusPage extends StatefulWidget {
   @override
   _EventBusPageState createState() => _EventBusPageState();
 }
