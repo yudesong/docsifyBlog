@@ -57,14 +57,14 @@ KOOM是快手性能优化团队在处理移动端OOM问题的过程中沉淀出�
 点击按钮，经过dump heap -> heap analysis -> report cache/koom/report/三个流程(heap analysis时间会比较长，但是完全不影响应用的正常操作),最终在应用的cache/koom/report里生成json报告：
 
 ```
-bash 体验AI代码助手 代码解读复制代码cepheus:/data/data/com.kwai.koom.demo/cache/koom/report # ls
+cepheus:/data/data/com.kwai.koom.demo/cache/koom/report # ls
 2020-12-08_15-23-32.json
 ```
 
 模拟一个最简单的单例CommonUtils持有LeakActivity实例的内存泄漏，看下json最终上报的内容是个啥：
 
 ```
-json 体验AI代码助手 代码解读复制代码{
+{
    "analysisDone":true,
    "classInfos":[
        {
@@ -193,7 +193,7 @@ HeapAnalysisTrigger
 这里主要是研究HeapMonitor中isTrigger规则，每隔5S都会循环判断该触发条件。
 
 ```javascript
-ini 体验AI代码助手 代码解读复制代码com/kwai/koom/javaoom/monitor/HeapMonitor.java
+com/kwai/koom/javaoom/monitor/HeapMonitor.java
 @Override
 public boolean isTrigger() {
   if (!started) {
@@ -278,7 +278,7 @@ public static class HeapThreshold {
 接下来详细分析下fork dump方案的实现： 目前项目中默认使用ForkJvmHeapDumper来执行dump。
 
 ```
-scss 体验AI代码助手 代码解读复制代码com/kwai/koom/javaoom/dump/ForkJvmHeapDumper.java
+com/kwai/koom/javaoom/dump/ForkJvmHeapDumper.java
 @Override
 public boolean dump(String path) {
   boolean dumpRes = false;
@@ -311,7 +311,7 @@ native层：
 正常操作就应该是：
 
 ```
-scss 体验AI代码助手 代码解读复制代码void *libHandle = dlopen("libart.so", RTLD_NOW);//打开libart.so, 拿到文件操作句柄
+void *libHandle = dlopen("libart.so", RTLD_NOW);//打开libart.so, 拿到文件操作句柄
 void *suspendVM = dlsym(libHandle, LIBART_DBG_SUSPEND);//获取suspendVM方法引用
 void *resumeVM = dlsym(libHandle, LIBART_DBG_RESUME);//获取resumeVM方法引用
 dlclose(libHandle);//关闭libart.so文件操作句柄
@@ -322,7 +322,7 @@ dlclose(libHandle);//关闭libart.so文件操作句柄
 源码参考：Android 9.0
 
 ```javascript
-arduino 体验AI代码助手 代码解读复制代码/bionic/libdl/libdl.cpp
+/bionic/libdl/libdl.cpp
 02__attribute__((__weak__))
 103void* dlopen(const char* filename, int flag) {
 104  const void* caller_addr = __builtin_return_address(0);//得到当前函数返回地址
@@ -369,7 +369,7 @@ arduino 体验AI代码助手 代码解读复制代码/bionic/libdl/libdl.cpp
 **大于N小于Q的Android版本**
 
 ```typescript
-arduino 体验AI代码助手 代码解读复制代码using __loader_dlopen_fn = void *(*)(const char *filename, int flag, void *address);
+using __loader_dlopen_fn = void *(*)(const char *filename, int flag, void *address);
 void *handle = ::dlopen("libdl.so", RTLD_NOW);//打开libel.so
 //这里直接调用其__loader_dlopen方法，它与dlopen区别是可以传入caller address
 auto __loader_dlopen = reinterpret_cast<__loader_dlopen_fn>(::dlsym(handle,"__loader_dlopen"));
@@ -383,7 +383,7 @@ __loader_dlopen(lib_name, flags, (void *) dlerror);//传入dlerror系统函数�
 这里通过dl_iterate_phdr在当前进程中查询已加载的符合条件的动态库基对象地址。
 
 ```html
-ini 体验AI代码助手 代码解读复制代码int DlFcn::dl_iterate_callback(dl_phdr_info
+int DlFcn::dl_iterate_callback(dl_phdr_info
 *info, size_t size, void *data) { auto target = reinterpret_cast<dl_iterate_data
   *
   >(data); if (info->dlpi_addr != 0 && strstr(info->dlpi_name,
@@ -402,7 +402,7 @@ ini 体验AI代码助手 代码解读复制代码int DlFcn::dl_iterate_callback(
 附：
 
 ```javascript
-scss 体验AI代码助手 代码解读复制代码struct dl_phdr_info {
+struct dl_phdr_info {
   ElfW(Addr) dlpi_addr;//基对象地址
   const ElfW(Phdr)* dlpi_phdr;//指针数组
   ElfW(Half) dlpi_phnum;//
@@ -417,7 +417,7 @@ scss 体验AI代码助手 代码解读复制代码struct dl_phdr_info {
 内存泄漏检测核心代码在于SuspicionLeaksFinder.find
 
 ```html
-scss 体验AI代码助手 代码解读复制代码public Pair<List<ApplicationLeak>, List<LibraryLeak>> find() {
+public Pair<List<ApplicationLeak>, List<LibraryLeak>> find() {
   boolean indexed = buildIndex();
   if (!indexed) {
    return null;
@@ -431,7 +431,7 @@ scss 体验AI代码助手 代码解读复制代码public Pair<List<ApplicationLe
 ##### 4.3.1 buildIndex()
 
 ```typescript
-kotlin 体验AI代码助手 代码解读复制代码private boolean buildIndex() {
+private boolean buildIndex() {
   Hprof hprof = Hprof.Companion.open(hprofFile.file());
   //选择可以作为gcroot的类类型
   KClass<GcRoot>[] gcRoots = new KClass[]{
@@ -490,7 +490,7 @@ HprofInMemoryIndex.onHprofRecord() 封装index：
 - primitiveArrayIndex
 
 ```typescript
-kotlin 体验AI代码助手 代码解读复制代码class HprofHeapGraph internal constructor(
+class HprofHeapGraph internal constructor(
    private val hprof: Hprof,
    private val index: HprofInMemoryIndex
 ) : HeapGraph {
@@ -540,7 +540,7 @@ Hprof 经过层层转换最终封装为HprofHeapGraph。
 初始化泄漏检测者：
 
 ```
-scss 体验AI代码助手 代码解读复制代码private void initLeakDetectors() {
+private void initLeakDetectors() {
   addDetector(new ActivityLeakDetector(heapGraph));
   addDetector(new FragmentLeakDetector(heapGraph));
   addDetector(new BitmapLeakDetector(heapGraph));
@@ -556,7 +556,7 @@ scss 体验AI代码助手 代码解读复制代码private void initLeakDetectors
 其次是梳理以上几类对象类继承关系串，检测覆盖到他们的子类。
 
 ```javascript
-scss 体验AI代码助手 代码解读复制代码public void findLeaks() {
+public void findLeaks() {
   KLog.i(TAG, "start find leaks");
   //从HprofHeapGraph中获取所有instance
   Sequence<HeapObject.HeapInstance> instances = heapGraph.getInstances();
@@ -592,7 +592,7 @@ scss 体验AI代码助手 代码解读复制代码public void findLeaks() {
 这里重点看看各类型对象是如何判断泄漏的：
 
 ```
-java 体验AI代码助手 代码解读复制代码ActivityLeakDetector:
+ActivityLeakDetector:
 
 private static final String ACTIVITY_CLASS_NAME = "android.app.Activity";
 private static final String FINISHED_FIELD_NAME = "mFinished";
@@ -620,7 +620,7 @@ public boolean isLeak(HeapObject.HeapInstance instance) {
 mDestroyed和mFinish字段为true，但是实例还存在的Activity是疑似泄漏对象。
 
 ```javascript
-ini 体验AI代码助手 代码解读复制代码FragmentLeakDetector:
+FragmentLeakDetector:
 
   private static final String NATIVE_FRAGMENT_CLASS_NAME = "android.app.Fragment";
 // native android Fragment, deprecated as of API 28.
@@ -685,7 +685,7 @@ public boolean isLeak(HeapObject.HeapInstance instance) {
 对应的FragmentManager实例为null（这表示fragment被remove了）且满足对应的mCalled为true,即非perform状态，而是对应生命周期被回调状态（onDestroy），但是实例还存在的Fragment是疑似泄漏对象。
 
 ```
-scss 体验AI代码助手 代码解读复制代码BitmapLeakDetector
+BitmapLeakDetector
 
 private static final String BITMAP_CLASS_NAME = "android.graphics.Bitmap”;
 public boolean isLeak(HeapObject.HeapInstance instance) {

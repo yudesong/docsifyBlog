@@ -104,7 +104,7 @@ tags:
   收集页面数据时发现有些fragment是希望当作页面来看待，并且计算pv的(如首页用fragmen实现的tab)。而fragment的页面显示／隐藏事件需要根据：
 
 ```
- 体验AI代码助手 代码解读复制代码onResume()
+ onResume()
 onPause()
 onHiddenChanged(boolean hidden)
 setUserVisibleHint(boolean isVisibleToUser)
@@ -123,13 +123,13 @@ setUserVisibleHint(boolean isVisibleToUser)
   假设我们有一个Fragment1（空类，内部什么代码也没有）
 
 ```javascript
- 体验AI代码助手 代码解读复制代码public class Fragment1 extends Fragment {}
+ public class Fragment1 extends Fragment {}
 ```
 
   经过扫描修改字节码后变为：
 
 ```javascript
- 体验AI代码助手 代码解读复制代码public class Fragment1 extends Fragment {
+ public class Fragment1 extends Fragment {
 
     @TransformedDCSDK
     public void onResume() {
@@ -178,7 +178,7 @@ setUserVisibleHint(boolean isVisibleToUser)
   假设有个实现接口的类
 
 ```javascript
- 体验AI代码助手 代码解读复制代码public class MyOnClickListener implements OnClickListener {
+ public class MyOnClickListener implements OnClickListener {
     public void onClick(View v) {
         //此处代表点击发生时的业务逻辑
     }
@@ -188,7 +188,7 @@ setUserVisibleHint(boolean isVisibleToUser)
 经过扫描修改字节码后变为：
 
 ```javascript
- 体验AI代码助手 代码解读复制代码public class MyOnClickListener implements OnClickListener {
+ public class MyOnClickListener implements OnClickListener {
     @TransformedDCSDK
     public void onClick(View v) {
         if (!Monitor.onViewClick(v)) {
@@ -219,7 +219,7 @@ setUserVisibleHint(boolean isVisibleToUser)
   假设项目中有一个代码（例如方法）块如下，其中某处调用了dialog.show()
 
 ```
- 体验AI代码助手 代码解读复制代码某个方法 {
+ 某个方法 {
     //其他代码
     dialog.show()
     //其他代码
@@ -229,7 +229,7 @@ setUserVisibleHint(boolean isVisibleToUser)
 经过扫描修改字节码后变为
 
 ```
- 体验AI代码助手 代码解读复制代码某个方法 {
+ 某个方法 {
     //其他代码
     Monitor.showDialog(dialog)
     //其他代码
@@ -283,7 +283,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
 - 具体来说，进行图4-1中dex任务是一个叫dx.jar的jar包，存在于Android SDK的sdk/build-tools/22.0.1/lib/dx.jar目录中，通过类似 :
 
   ```
-   体验AI代码助手 代码解读复制代码java dx.jar com.android.dx.command.Main --dex --num-threads=4 —-output output.jar input.jar
+   java dx.jar com.android.dx.command.Main --dex --num-threads=4 —-output output.jar input.jar
   ```
 
   的命令，进行将class文件打包为dex文件的步骤。
@@ -291,7 +291,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
 - 从上面的演示命令可以看出，dex任务是启动一个java进程，执行dx.jar中com.android.dx.command.Main类(当然对于multidex的项目入口可能不是这个类，这个再说)的main()方法进行dex任务，具体完成class到dex转化的是这个方法：
 
 ```
- 体验AI代码助手 代码解读复制代码private static boolean processClass(String name,byte[] bytes) {
+ private static boolean processClass(String name,byte[] bytes) {
       //内容省略
 }
 ```
@@ -307,7 +307,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
   对于Android Gradle Plugin 版本在1.5.0及以上的情况，Google官方提供了transformapi用作字节码插桩的入口。此处的Android Gradle Plugin 版本指的是build.gradle dependencies的如下配置：
 
 ```
- 体验AI代码助手 代码解读复制代码compile 'com.android.tools.build:gradle:1.5.0'
+ compile 'com.android.tools.build:gradle:1.5.0'
 ```
 
 此处1.5.0即为Android Build Gradle Plugin 版本。
@@ -329,7 +329,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
   hook dx.jar 即是在图4-1中的dex步骤进行hook，具体来讲就是hook 4.1节介绍的dx.jar中com.android.dx.command.Main.processClass方法，将这个方法的字节码更改为：
 
 ```
- 体验AI代码助手 代码解读复制代码private static boolean processClass(String name,byte[] bytes) {
+ private static boolean processClass(String name,byte[] bytes) {
 
   bytes＝扫描并修改（bytes）；// Hook点
 
@@ -355,19 +355,19 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
   开发者可以在一个普通 Java 程序（带有 main 函数的 Java 类）运行时，通过 **– javaagent** 参数指定一个**特定的 jar 文件(agent.jar)**（包含 Instrumentation 代理）来启动 Instrumentation 的代理程序。例如:
 
   ```
-   体验AI代码助手 代码解读复制代码java -javaagent agent.jar  dex.jar  com.android.dx.command.Main  --dex …........
+   java -javaagent agent.jar  dex.jar  com.android.dx.command.Main  --dex …........
   ```
 
   如此，则在目标main函数执行之前，执行agent jar包指定类的 premain方法 ：
 
   ```
-   体验AI代码助手 代码解读复制代码premain(String args, Instrumentation inst)
+   premain(String args, Instrumentation inst)
   ```
 
 - 方式二(java 1.6+)：
 
   ```
-   体验AI代码助手 代码解读复制代码VirtualMachine.loadAgent(agent.jar)
+   VirtualMachine.loadAgent(agent.jar)
   VirtualMachine vm = VirtualMachine.attach(pid);
   vm.loadAgent(jarFilePath, args);
   ```
@@ -375,7 +375,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
   此时，将执行agent jar包指定类的 agentmain方法：
 
   ```
-   体验AI代码助手 代码解读复制代码agentmain(String args, Instrumentation inst)
+   agentmain(String args, Instrumentation inst)
   ```
 
 ##### 说明：
@@ -384,7 +384,7 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
     这里的agent就是一个包含一些指定信息的jar包，就像OSGI的插件jar包一样，在jar包的META-INF/MANIFEST.MF中添加如下信息：
 
   ```javascript
-   体验AI代码助手 代码解读复制代码Manifest-Version: 1.0
+   Manifest-Version: 1.0
   Agent-Class: XXXXX
   Premain-Class: XXXXX
   Can-Redefine-Classes: true
@@ -397,20 +397,20 @@ B、bytecode manipulate（上图3-1 中第二个环节），这个环节主要�
     第二个参数，Instumentation 类有个方法
 
   ```
-   体验AI代码助手 代码解读复制代码addTransformer(ClassFileTransformer transformer,boolean canRetransform)
+   addTransformer(ClassFileTransformer transformer,boolean canRetransform)
   ```
 
     而一旦为Instrumentation inst添加了ClassFileTransformer：
 
   ```
-   体验AI代码助手 代码解读复制代码ClassFileTransformer c=new ClassFileTransformer()
+   ClassFileTransformer c=new ClassFileTransformer()
   inst.addTransformer(c,true);
   ```
 
     那么以后这个jvm进程中再有**任何类的加载定义**，都会出发此ClassFileTransformer的transform方法
 
   ```javascript
-   体验AI代码助手 代码解读复制代码byte[] transform(  ClassLoader loader,String className,Class classBeingRedefined,ProtectionDomain protectionDomain,byte[] classfileBuffer)throwsIllegalClassFormatException;
+   byte[] transform(  ClassLoader loader,String className,Class classBeingRedefined,ProtectionDomain protectionDomain,byte[] classfileBuffer)throwsIllegalClassFormatException;
   ```
 
     其中，参数byte\[\] classfileBuffer是类的class文件数据，对它进行修改就可以达到在一个标准的java进程中对特定方法进行字节码插桩的目的。
@@ -433,7 +433,7 @@ B. 通过Java Instrumentation机制，为获得插桩入口，对于apk build过
   ProcessBuilder类是J2SE 1.5在java.lang中新添加的一个新类，此类用于创建操作系统进程，它提供一种启动和管理进程的方法，start方法就是开始创建一个进程,对它进行插桩，使得通过下面方式启动dx.jar进程执行dex任务时：
 
   ```
-   体验AI代码助手 代码解读复制代码java  dex.jar  com.android.dx.command.Main  --dex …........
+   java  dex.jar  com.android.dx.command.Main  --dex …........
   ```
 
   增加参数**\-javaagent agent.jar**，使得dex进程也可以使用Java Instrumentation机制进行字节码插桩
@@ -485,7 +485,7 @@ C. ASM库更加强大灵活，比如可以感知细到字节码指令层次（�
 按照class文件格式，按次序访问类文件每一部分，如下：
 
 ```javascript
- 体验AI代码助手 代码解读复制代码public abstract class ClassVisitor {
+ public abstract class ClassVisitor {
 public ClassVisitor(int api);
 public ClassVisitor(int api, ClassVisitor cv);
 public void visit(int version, int access, String name,
@@ -519,7 +519,7 @@ String signature, String[] exceptions); void visitEnd();
 按以下次序访问一个方法：
 
 ```
- 体验AI代码助手 代码解读复制代码visitAnnotationDefault?
+ visitAnnotationDefault?
 ( visitAnnotation | visitParameterAnnotation | visitAttribute )*
   ( visitCode
     ( visitTryCatchBlock | visitLabel | visitFrame | visitXxxInsn | visitLocalVariable | visitLineNumber )*
@@ -551,7 +551,7 @@ visitEnd
   全限定名即为全类名中的“.”,换为“/”，举例：
 
   ```
-   体验AI代码助手 代码解读复制代码类android.widget.AdapterView.OnItemClickListener的全限定名为：
+   类android.widget.AdapterView.OnItemClickListener的全限定名为：
   android/widget/AdapterView$OnItemClickListener
   ```
 
@@ -568,13 +568,13 @@ Android中的android.view.View类，描述符为“Landroid/view/View;”
 2.方法描述符的组织结构为：
 
 ```
- 体验AI代码助手 代码解读复制代码（参数类型描述符）返回值描述符
+ （参数类型描述符）返回值描述符
 ```
 
 其中无返回值void用“V”代替,举例：
 
 ```
- 体验AI代码助手 代码解读复制代码方法boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) 　的描述符如下：
+ 方法boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) 　的描述符如下：
 (Landroid/widget/ExpandableListView;Landroid/view/View;IJ)Z
 ```
 
@@ -594,7 +594,7 @@ jvm执行引擎用于执行字节码，如下图
   故名思义，存储当前方法中的局部变量，包括方法的入参。值得注意的是局部变量表的第一个槽位存放的是this。还拿方法onGroupClick举例：
 
   ```
-   体验AI代码助手 代码解读复制代码boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
+   boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
   ```
 
   刚进入此方法时，局部变量表的槽位状态如下：
@@ -617,7 +617,7 @@ jvm执行引擎用于执行字节码，如下图
 例如，方法体中有语句如下：
 
 ```
- 体验AI代码助手 代码解读复制代码1+1
+ 1+1
 ```
 
 - 在执行iadd之前需要先压两个“1”到操作数栈（因为iadd指令需要两个操作数，执行后产生一个操作数）
@@ -655,7 +655,7 @@ ClassVisitor每扫描到一个方法时，在visitMethod中进行如下判定：
 假设待修改的onClick方法如下：
 
 ```
- 体验AI代码助手 代码解读复制代码public void onClick(View v) {
+ public void onClick(View v) {
         System.out.println("test");//代表方法中原有的代码（逻辑）
 }
 ```
@@ -663,7 +663,7 @@ ClassVisitor每扫描到一个方法时，在visitMethod中进行如下判定：
 修改之后需要变成：
 
 ```
- 体验AI代码助手 代码解读复制代码public void onClick(View v) {
+ public void onClick(View v) {
         if(!Monitor.onViewClick(v)) {
             System.out.println("test");//代表方法中原有的代码（逻辑）
         }
@@ -674,7 +674,7 @@ ClassVisitor每扫描到一个方法时，在visitMethod中进行如下判定：
   进入方法之后先执行Monitor.onViewClick(v)（里面是数据收集逻辑），然后根据返回值决定是执行原有onClick方法内的逻辑，还是说直接返回。下面是修改之后onClick方法的字节码：
 
 ```
- 体验AI代码助手 代码解读复制代码public onClick(Landroid/view/View;)V
+ public onClick(Landroid/view/View;)V
     ALOAD 1//插入的字节码，将index为1的局部变量（入参v）压入操作数栈
     INVOKESTATIC com/netease/lede/bytecode/monitor/Monitor.onViewClick (Landroid/view/View;)Z//插入的字节码，调用方法Monitor.onViewClick(v)，将返回值（true/false）压入操作数栈
     IFEQ L0//插入的字节码,如果操作数栈栈顶为0（if条件为false），则跳转到lable L0，执行原有逻辑

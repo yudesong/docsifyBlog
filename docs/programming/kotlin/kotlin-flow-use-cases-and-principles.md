@@ -16,7 +16,7 @@ publishedTime: 2021-07-26T08:55:29+08:00
 异步调用在 App 开发中随处可见，通常把耗时操作放到另一个线程执行，比如写文件：
 
 ```kotlin
-kotlin复制代码suspend fun writeFile(content: String) {
+suspend fun writeFile(content: String) {
     // 写文件
 }
 
@@ -30,7 +30,7 @@ kotlin 中的 `suspend` 方法用于表达一个异步过程，“多个连续�
 for 循环是首先想到的方案：
 
 ```kotlin
-kotlin复制代码val contents = listOf<String>(...) // 将要写入文件的多个字串
+val contents = listOf<String>(...) // 将要写入文件的多个字串
 contents.forEach { string ->
     coroutineScope.launch { writeFile(string) }
 }
@@ -47,7 +47,7 @@ contents.forEach { string ->
 首先得实现一个定时器，它可以在异步线程中以一定时间间隔执行异步操作。用线程池就再合适不过了：
 
 ```kotlin
-kotlin复制代码// 倒计时器
+// 倒计时器
 class Countdown<T>(
     private var duration: Long, // 倒计时长
     private var interval: Long, // 倒计时间隔
@@ -104,7 +104,7 @@ class Countdown<T>(
 然后就可以像这样使用：
 
 ```kotlin
-kotlin复制代码Countdown(60_000, 2_000) { remianTime -> calculate(remianTime) }.apply {
+Countdown(60_000, 2_000) { remianTime -> calculate(remianTime) }.apply {
     onStart = { Log.v("test", "countdown start") }
     onEnd = { ret -> Log.v("test", "countdown end, ret=$ret") }
     accumulator = { acc, value -> acc + value }
@@ -118,7 +118,7 @@ kotlin复制代码Countdown(60_000, 2_000) { remianTime -> calculate(remianTime)
 若用 Flow 就可以省去这些复杂度：
 
 ```kotlin
-kotlin复制代码fun <T> countdown(
+fun <T> countdown(
     duration: Long,
     interval: Long,
     onCountdown: suspend (Long) -> T
@@ -133,7 +133,7 @@ kotlin复制代码fun <T> countdown(
 定义了一个顶层方法 `countdown()` ，它返回一个流实例用于在异步线程中生产倒计时，并将倒计时传入异步任务 `onCountdown()` 执行。然后就可以像这样使用：
 
 ```kotlin
-kotlin复制代码val mainScope = MainScope()
+val mainScope = MainScope()
 mainScope.launch {
     val ret = countdown(60_000, 2_000) { remianTime -> calculate(remianTime) }
         .onStart { Log.v("test", "countdown start") }
@@ -150,7 +150,7 @@ mainScope.launch {
 Flow 的定义及其简单，只包含了 2 个接口：
 
 ```kotlin
-kotlin复制代码public interface Flow<out T> {
+public interface Flow<out T> {
     public suspend fun collect(collector: FlowCollector<T>)
 }
 ```
@@ -158,7 +158,7 @@ kotlin复制代码public interface Flow<out T> {
 Flow 是一个接口，其中定义了一个 `collect()` 方法，表示“流可以被收集”，而收集器也是一个接口：
 
 ```kotlin
-kotlin复制代码public interface FlowCollector<in T> {
+public interface FlowCollector<in T> {
     public suspend fun emit(value: T)
 }
 ```
@@ -170,7 +170,7 @@ kotlin复制代码public interface FlowCollector<in T> {
 一个最简单的生产和消费数据的场景：
 
 ```kotlin
-kotlin复制代码// 启动协程
+// 启动协程
 GlobalScope.launch {
     // 构建流
     flow { // 定义流如何生产数据
@@ -188,7 +188,7 @@ GlobalScope.launch {
 
 - 通过 `flow{ block }` 构建了一个流，它是一个顶层方法：
   ```kotlin
-  kotlin复制代码// 构建安全流（传入 block 定义如何生产流数据）
+  // 构建安全流（传入 block 定义如何生产流数据）
   public fun <T> flow(block: suspend FlowCollector<T>.() -> Unit): Flow<T> =
       SafeFlow(block)
       // 安全流继承自抽象流
@@ -215,7 +215,7 @@ GlobalScope.launch {
   `flow { block }` 中的 block 定义了如何生产数据，而 block 是在 `collect()` 中被调用的。所以 **流中的数据不会自动生产，直到流被收集的那一刻。**
 - 通过 `collect{ action }` 收集了这个流，其中的 action 定义了如何消费数据。 `collect()` 是 Flow 的扩展方法：
   ```kotlin
-  kotlin复制代码public suspend inline fun <T> Flow<T>.collect(crossinline action: suspend (value: T) -> Unit): Unit =
+  public suspend inline fun <T> Flow<T>.collect(crossinline action: suspend (value: T) -> Unit): Unit =
       collect(object : FlowCollector<T> {
           override suspend fun emit(value: T) = action(value)
       })
@@ -230,7 +230,7 @@ GlobalScope.launch {
 所以上述的实例代码，无异于如下的同步调用：
 
 ```kotlin
-kotlin复制代码// 生产者消费者伪代码
+// 生产者消费者伪代码
 flow {
     emit(data) // 生产
 }.collect {
@@ -252,7 +252,7 @@ Flow.collect {
 现在回看一下倒计时流是如何生产并消费数据的：
 
 ```kotlin
-kotlin复制代码fun <T> countdown(
+fun <T> countdown(
     duration: Long,
     interval: Long,
     onCountdown: suspend (Long) -> T
@@ -267,7 +267,7 @@ kotlin复制代码fun <T> countdown(
 countdown() 方法的第一句就定义了倒计时流中生产数据的方式：
 
 ```kotlin
-kotlin复制代码flow { (duration - interval downTo 0 step interval).forEach { emit(it) } }
+flow { (duration - interval downTo 0 step interval).forEach { emit(it) } }
 ```
 
 `flow {}` 构建了一个流实例。在内部创建了一个从 duration - interval 到 0 步长为 step 的值序列，它被遍历的同时调用 `emit()` 将每个值发射出去。
@@ -283,7 +283,7 @@ kotlin复制代码flow { (duration - interval downTo 0 step interval).forEach { 
 `transform()` 是一个最常见的中间消费者，它是一个 Flow 的扩展方法：
 
 ```kotlin
-kotlin复制代码public inline fun <T, R> Flow<T>.transform(
+public inline fun <T, R> Flow<T>.transform(
     crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
 ): Flow<R> =
     // 构建下游流
@@ -301,7 +301,7 @@ transform() 做了三件事情：构建了一个新流（下游流），当下�
 `FlowCollector<R>.(value: T) -> Unit` 是一个带接收者的 lambda，接收者是 `FlowCollector` 。调用这种 labmda 时需要指定接收者，在 transform() 的语境中接收者是 `this` ，所以省略了，如果将其补全，就是下面这样：
 
 ```kotlin
-kotlin复制代码public inline fun <T, R> Flow<T>.transform(
+public inline fun <T, R> Flow<T>.transform(
     crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
 ): Flow<R> =
     // 构建下游流
@@ -325,7 +325,7 @@ public fun <T> flow(block: suspend FlowCollector<T>.() -> Unit): Flow<T> =
 所以 transform() 通常用于定义新的中间消费者， `onEach()` 的定义就借助于它：
 
 ```kotlin
-kotlin复制代码public fun <T> Flow<T>.onEach(action: suspend (T) -> Unit): Flow<T> = transform { value ->
+public fun <T> Flow<T>.onEach(action: suspend (T) -> Unit): Flow<T> = transform { value ->
     action(value)
     return@transform emit(value)
 }
@@ -338,7 +338,7 @@ onEach() 通过 transform() 构建了一个下游流，并在转发每一个上�
 map() 也是通过 transform() 实现的：
 
 ```kotlin
-kotlin复制代码public inline fun <T, R> Flow<T>.map(crossinline transform: suspend (value: T) -> R): Flow<R> =
+public inline fun <T, R> Flow<T>.map(crossinline transform: suspend (value: T) -> R): Flow<R> =
     transform { value -> return@transform emit(transform(value)) }
 ```
 
@@ -347,7 +347,7 @@ map() 通过 transform() 构建了一个下游流，并且在拿到上游流数�
 利用 transform() 的机制，可以很方便地自定义一个中间消费者：
 
 ```kotlin
-kotlin复制代码fun <T, R> Flow<T>.filterMap(
+fun <T, R> Flow<T>.filterMap(
     predicate: (T) -> Boolean,
     transform: suspend (T) -> R
 ): Flow<R> =
@@ -361,7 +361,7 @@ filterMap() 只对上游数据中满足 predicate 条件的数据进行变换并
 onStart() 也是中间消费者，但它没有借助于 transform()，而是通过 `unsafeFlow()` 构建了一个下游流：
 
 ```kotlin
-kotlin复制代码public fun <T> Flow<T>.onStart(
+public fun <T> Flow<T>.onStart(
     action: suspend FlowCollector<T>.() -> Unit
 ): Flow<T> = unsafeFlow { // 构建下游流
     val safeCollector = SafeCollector<T>(this, currentCoroutineContext())
@@ -388,7 +388,7 @@ unsafeFlow() 直接实例化了 `Flow` 接口，并定义了该流被收集时�
 ### onCompletion()
 
 ```kotlin
-kotlin复制代码public fun <T> Flow<T>.onCompletion(
+public fun <T> Flow<T>.onCompletion(
     action: suspend FlowCollector<T>.(cause: Throwable?) -> Unit
 ): Flow<T> = unsafeFlow { // 构建下游流
     try {
@@ -411,7 +411,7 @@ onCompletion() 的实现和 onStart() 很类似，只不过是在收集数据之
 因为 onStart() 和 onCompletion() 都用下游流套上游流的方式实现，只是收集数据和执行动作的顺序不同，就会产生下面这样有趣的效果：
 
 ```kotlin
-kotlin复制代码GlobalScope.launch {
+GlobalScope.launch {
     flow {
 3
 
@@ -429,7 +429,7 @@ kotlin复制代码GlobalScope.launch {
 上述代码的输出结果如下：
 
 ```kotlin
-kotlin复制代码start2
+start2
 start1
 1
 2
@@ -449,7 +449,7 @@ complete2
 看一个冷流的例子：
 
 ```kotlin
-kotlin复制代码// 执行式的
+// 执行式的
 suspend fun get(): List<String> =
     listof("a", "b", "c").onEach {
         delay(1000)
@@ -473,7 +473,7 @@ fun get(): Flow<String> =
 倒计时 demo 的 `reduce()` 就是一个终端消费者：
 
 ```kotlin
-kotlin复制代码val mainScope = MainScope()
+val mainScope = MainScope()
 mainScope.launch {
     val ret = countdown(60_000, 2_000) { io(it) }
         .onStart { Log.v("test", "countdown start") }
@@ -487,7 +487,7 @@ mainScope.launch {
 reduce() 的源码如下：
 
 ```kotlin
-kotlin复制代码public suspend fun <S, T : S> Flow<T>.reduce(
+public suspend fun <S, T : S> Flow<T>.reduce(
     operation: suspend (accumulator: S, value: T) -> S // 累加算法
 ): S {
     var accumulator: Any? = NULL
@@ -529,10 +529,6 @@ countdown() 方法通过 `flowOn(Dispatchers.Default)` ，实现了后台执行�
 6. 所有能触发收集数据动作的消费者称为 **终端消费者** ，它就像点燃鞭炮的星火，使得被若干个中间消费者套娃的流从外向内（从下游到上游）一个个的被收集，最终传导到原始流，触发数据的发射。
 7. 默认情况下，流中生产和消费数据是在同一个线程中进行的。但可以通过 `flowOn()` 改变上游流执行的线程，这并不影响下游流所执行的线程。
 8. `Flow` 中生产和消费数据的操作都被包装在用 suspend 修饰的 lambda 中，用协程就可以轻松的实现异步生产，异步消费。
-
-下一篇会继续介绍如何利用 Flow 实现限流，欢迎关注，以及时获得更新提醒~
-
-本篇中用 Flow 实现的倒计时，其实隐含了一个错误。不知道大家发现没有，后续篇章会详细分析原因，敬请期待~
 
 ## 推荐阅读
 

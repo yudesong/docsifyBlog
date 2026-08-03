@@ -125,9 +125,6 @@ EventHub实现在 framework/base/services/input/EventHub.cpp, 它和InputReader 
 15.  最终的发送发生在InputPublish的sendMessage()。这里就用到了我们前面提到的SocketPair, 一旦sendMessage() 执行，目标窗口所在进程的Looper线程就会被唤醒，然后读取键值并进行处理，这个过程我们下面马上就会谈到。
 16.  乖乖，还没走完啊？是的，工作还差最后一步，Input Dispatcher给这个窗口发送下一个命令之前，必须等待该窗口的回复，如果超过5s没有收到，就会通过Input Manager Service 向Activity Manager 汇报，后者会弹出我们熟知的 "Application No Response" 窗口。所以，事件会放入mWaitQueue进行暂存。如果窗口一切正常，完成按键处理后它会调用InputConsumer的sendFinishedSignal() 往SocketPair 里写入完成信号，Input Dispatcher 从 Loop中醒来，并从Socket中读取该信号，然后从mWaitQueue 里清除该事件标志其处理完毕。
 17.  并非所有的事件应用程序都会处理，如果没有处理，窗口程序返回的完成消息里的 msg.body.finished.handled 会等于false，InputDispatcher 会调用dispatchKeyUnhandled() 将其交给PhoneWindowManager。Android 在这里提供了一个Fallback机制，如果在 /system/usr/keychars/ 下面的kcm文件里定义了 fallback关键字，Android就识别它为一个Fallback Keycode。当它的Parent Keycode没有被应用程序处理，InputDispatcher 会把 Fallback Keycode 当成一个新的Event，重新发给应用程序。下面是一个定义Fallback Key 的例子。如果按了小键盘的0且应用程序不受理它，InputDispatcher 会再发送一个'INSERT' event 给应用程序。
-    
-    ![复制代码](https://assets.cnblogs.com/images/copycode.gif)
-    
     ```
     #/system/usr/keychars/generic.kcm
     ...
@@ -137,9 +134,6 @@ EventHub实现在 framework/base/services/input/EventHub.cpp, 它和InputReader 
         numlock: '0'        //在一个textView里输出的字符
     }
     ```
-    
-    ![复制代码](https://assets.cnblogs.com/images/copycode.gif)
-    
 18.  经历了重重关卡，一个按键发送的流程终于完成了，不管有没有Fallback Key存在，调用startDispatcherCycle() 开始下一轮征程。。。
 
 史上最长的流程图终于介绍完了，有点迷糊了？好吧，再看看下面这张图总结一下：

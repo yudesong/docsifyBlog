@@ -74,7 +74,7 @@ kotlin的协程实现分为了两个层次：
 在 `project` 的 `gradle` 添加 `Kotlin` 编译插件：
 
 ```java
-java复制代码dependencies {
+dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32"
 }
 ```
@@ -82,7 +82,7 @@ java复制代码dependencies {
 要使用协程，还需要在app的 `build.gradle` 文件中添加依赖:
 
 ```java
-java复制代码dependencies {
+dependencies {
      //协程标准库
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.4.32"
     //协程核心库
@@ -112,7 +112,7 @@ kotlin协程基于Thread相关API的封装，让我们不用过多关心线程�
 我们使用 `Retrofit` 发起了一个异步请求，从服务端查询用户的信息，通过 `CallBack` 返回 `response` ：
 
 ```kotlin
-kotlin复制代码    val call: Call<User> = userApi.getUserInfo("suming")
+    val call: Call<User> = userApi.getUserInfo("suming")
 
     call.enqueue(object : Callback<User> {
         //成功
@@ -132,7 +132,7 @@ kotlin复制代码    val call: Call<User> = userApi.getUserInfo("suming")
 使用协程，同样可以像 Rx 那样有效地消除回调地狱，不过无论是设计理念，还是代码风格，两者是有很大区别的，协程在写法上和普通的顺序代码类似，同步的方式去编写异步执行的代码。使用协程改造后代码如下：
 
 ```kotlin
-kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
+GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
     val result = userApi.getUserSuspend("suming")//网络请求（IO 线程）
     tv_name.text = result?.name //更新 UI（主线程）
 }
@@ -157,7 +157,7 @@ kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线�
 ## 三、基础
 
 ```kotlin
-kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
+GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
    val result = userApi.getUserSuspend("suming")//网络请求（IO 线程）
    tv_name.text = result?.name //更新 UI（主线程）
 }
@@ -176,7 +176,7 @@ kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线�
 #### runBlocking
 
 ```kotlin
-kotlin复制代码fun <T> runBlocking(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> T): T
+fun <T> runBlocking(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> T): T
 ```
 
 - **context：**   协程的上下文，表示协程的运行环境，包括协程调度器、代表协程本身的Job、协程名称、协程ID等，默认值是当前线程上的事件循环。(这里的 `context` 和Android的 `context` 不同，后面会讲解到)
@@ -186,7 +186,7 @@ kotlin复制代码fun <T> runBlocking(context: CoroutineContext = EmptyCoroutine
 它是一个顶层函数，不是 `GlobalScope` 的 API，可以在任意地方独立使用。它能创建一个新的协程同时阻塞当前线程，直到其内部所有逻辑以及子协程所有逻辑全部执行完成，它的目的是将常规的阻塞代码与以挂起 `suspend` 风格编写的库连接起来，常用于 `main` 函数和测试中。一般我们在项目中是不会使用的。
 
 ```kotlin
-kotlin复制代码fun runBloTest() {
+fun runBloTest() {
     print("start")
     //context上下文使用默认值,阻塞当前线程，直到代码块中的逻辑完成
     runBlocking {
@@ -212,7 +212,7 @@ kotlin复制代码fun runBloTest() {
 `launch` 是最常用的用于启动协程的方式，用于在不阻塞当前线程的情况下启动一个协程，并返回对该协程任务的引用，即 `Job` 对象。
 
 ```kotlin
-kotlin复制代码public fun CoroutineScope.launch(
+public fun CoroutineScope.launch(
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend CoroutineScope.() -> Unit
@@ -231,7 +231,7 @@ kotlin复制代码public fun CoroutineScope.launch(
 在应用范围内启动一个新协程，不会阻塞调用线程，协程的生命周期与应用程序一致。表示一个不绑定任何 `Job` 的全局作用域，用于启动顶层协程，这些协程在整个应用程序生命周期中运行，不会提前取消(不存在 `Job`)。
 
 ```kotlin
-kotlin复制代码fun launchTest() {
+fun launchTest() {
     print("start")
     //创建一个全局作用域协程，不会阻塞当前线程，生命周期与应用程序一致
     GlobalScope.launch {
@@ -260,7 +260,7 @@ kotlin复制代码fun launchTest() {
 启动一个新的协程而不阻塞当前线程，并返回对协程的引用作为一个 `Job` 。通过 `CoroutineContext` 至少一个协程上下文参数创建一个 `CoroutineScope` 对象。协程上下文控制协程生命周期和线程调度，使得协程和该组件生命周期绑定，组件销毁时，协程一并销毁，从而实现安全可靠地协程调用。 **这是在应用中最推荐使用的协程使用方式。**
 
 ```kotlin
-kotlin复制代码fun launchTest2() {
+fun launchTest2() {
     print("start")
     //开启一个IO模式的协程，通过协程上下文创建一个CoroutineScope对象,需要一个类型为CoroutineContext的参数
     val job = CoroutineScope(Dispatchers.IO).launch {
@@ -281,7 +281,7 @@ kotlin复制代码fun launchTest2() {
 通过 `launch` 在一个协程中启动子协程，可以根据业务需求创建一个或多个子协程：
 
 ```kotlin
-kotlin复制代码fun launchTest3() {
+fun launchTest3() {
     print("start")
     GlobalScope.launch {
         delay(1000)
@@ -307,7 +307,7 @@ kotlin复制代码fun launchTest3() {
 `async` 类似于 `launch` ，都是创建一个不会阻塞当前线程的新的协程。它们区别在于： `async` 的返回是 `Deferred` 对象，可通过 `Deffer.await()` 等待协程执行完成并获取结果，而 `launch` 不行。常用于并发执行-同步等待和获取返回值的情况。
 
 ```kotlin
-kotlin复制代码public fun <T> CoroutineScope.async(
+public fun <T> CoroutineScope.async(
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend CoroutineScope.() -> T
@@ -322,7 +322,7 @@ kotlin复制代码public fun <T> CoroutineScope.async(
 ##### await 获取返回值
 
 ```kotlin
-kotlin复制代码//获取返回值
+//获取返回值
 fun asyncTest1() {
     print("start")
     GlobalScope.launch {
@@ -354,7 +354,7 @@ fun asyncTest1() {
 当在协程作用域中使用 `async` 函数时可以创建并发任务：
 
 ```kotlin
-kotlin复制代码fun asyncTest2() {
+fun asyncTest2() {
     print("start")
     GlobalScope.launch {
         val time = measureTimeMillis {//计算执行时间
@@ -414,7 +414,7 @@ kotlin复制代码fun asyncTest2() {
 这里列举 `Job` 几个比较有用的函数：
 
 ```kotlin
-kotlin复制代码public interface Job : CoroutineContext.Element {
+public interface Job : CoroutineContext.Element {
     //活跃的，是否仍在执行
     public val isActive: Boolean
 
@@ -448,7 +448,7 @@ kotlin复制代码public interface Job : CoroutineContext.Element {
 这里模拟一个无限循环的协程，当协程是活跃状态时每秒钟打印两次消息，1.2秒后取消协程：
 
 ```kotlin
-kotlin复制代码fun jobTest() = runBlocking {
+fun jobTest() = runBlocking {
     val startTime = System.currentTimeMillis()
     val job = launch(Dispatchers.Default){
         var nextPrintTime = startTime
@@ -486,7 +486,7 @@ kotlin复制代码fun jobTest() = runBlocking {
 `Deferred` 继承自 `Job` ，具有与 `Job` 相同的状态机制。它是 `async` 构建协程返回的一个协程任务，可通过调用 `await()` 方法等待协程执行完成并获取结果。不同的是 `Job` 没有结果值， `Deffer` 有结果值。
 
 ```kotlin
-kotlin复制代码public interface Deferred<out T> : Job {
+public interface Deferred<out T> : Job {
     //等待协程执行完成并获取结果
     public suspend fun await(): T
 }
@@ -506,7 +506,7 @@ kotlin复制代码public interface Deferred<out T> : Job {
 每个协程生成器 `launch` 、 `async` 等都是 `CoroutineScope` 的扩展，并继承了它的 `coroutineContext` 自动传播其所有元素和取消。协程作用域本质是一个接口：
 
 ```kotlin
-kotlin复制代码public interface CoroutineScope {
+public interface CoroutineScope {
     //此域的上下文。Context被作用域封装，用于在作用域上扩展的协程构建器的实现。
     public val coroutineContext: CoroutineContext
 }
@@ -525,7 +525,7 @@ kotlin复制代码public interface CoroutineScope {
 - `MainScope` ：为UI组件创建主作用域。一个顶层函数，上下文是 `SupervisorJob() + Dispatchers.Main` ，说明它是一个在主线程执行的协程作用域，通过 `cancel` 对协程进行取消。推荐使用。
 
 ```kotlin
-kotlin复制代码fun scopeTest() {
+fun scopeTest() {
     //创建一个根协程
     GlobalScope.launch {//父协程
         launch {//子协程
@@ -556,7 +556,7 @@ Android 官方对协程的支持是非常友好的，KTX 为 Jetpack 的 `Lifecy
 在 `build.gradle` 添加Lifecycle相应基础组件后，再添加以下组件即可：
 
 ```kotlin
-kotlin复制代码// ViewModel
+// ViewModel
 implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 // LiveData
 implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
@@ -567,7 +567,7 @@ implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
 因为 `Activity` 实现了 `LifecycleOwner` 这个接口，而 `lifecycleScope` 则正是它的拓展成员，可以在Activity中直接使用 `lifecycleScope` 协程实例：
 
 ```kotlin
-kotlin复制代码class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -585,7 +585,7 @@ kotlin复制代码class MainActivity : AppCompatActivity() {
 在 `ViewModel` 中使用创建协程：
 
 ```kotlin
-kotlin复制代码class MainViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
     fun getData() {
         viewModelScope.launch {//使用viewModelScope创建协程
             //执行协程
@@ -617,7 +617,7 @@ kotlin复制代码class MainViewModel : ViewModel() {
 协程需要调度的位置就是挂起点的位置，只有当挂起点正在挂起的时候才会进行调度，实现调度需要使用协程的拦截器。调度的本质就是解决挂起点恢复之后的协程逻辑在哪里运行的问题。调度器也属于协程上下文一类，它继承自拦截器：
 
 ```kotlin
-kotlin复制代码public abstract class CoroutineDispatcher :
+public abstract class CoroutineDispatcher :
     AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
 
     //询问调度器是否需要分发
@@ -650,7 +650,7 @@ Kotlin 提供了四个调度器，您可以使用它们来指定应在何处运�
 所有的协程构造器（如 `launch` 和 `async` ）都接受一个可选参数，即 `CoroutineContext` ，该参数可用于显式指定要创建的协程和其它上下文元素所要使用的 `CoroutineDispatcher` 。
 
 ```kotlin
-kotlin复制代码fun dispatchersTest() {
+fun dispatchersTest() {
     //创建一个在主线程执行的协程作用域
     val mainScope = MainScope()
     mainScope.launch {
@@ -679,7 +679,7 @@ kotlin复制代码fun dispatchersTest() {
 在 Andorid 开发中，我们常常在子线程中请求网络获取数据，然后切换到主线程更新UI。官方为我们提供了一个 `withContext` 顶级函数，在获取数据函数内，调用 `withContext(Dispatchers.IO)` 来创建一个在 `IO` 线程池中运行的块。您放在该块内的任何代码都始终通过 `IO` 调度器执行。由于 `withContext` 本身就是一个 `suspend` 函数，它会使用协程来保证主线程安全。
 
 ```kotlin
-kotlin复制代码//用给定的协程上下文调用指定的挂起块，挂起直到它完成，并返回结果。
+//用给定的协程上下文调用指定的挂起块，挂起直到它完成，并返回结果。
 public suspend fun <T> withContext(
     context: CoroutineContext,
     block: suspend CoroutineScope.() -> T
@@ -692,7 +692,7 @@ public suspend fun <T> withContext(
 这个函数会使用新指定的上下文的 `dispatcher` ，将 `block` 的执行转移到指定的线程中。它会返回结果， 可以和当前协程的父协程存在交互关系, **主要作用为了来回切换调度器** 。
 
 ```kotlin
-kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
+GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
     val result: User = withContext(Dispatchers.IO) {//网络请求（IO 线程）
         userApi.getUserSuspend("FollowExcellence")
     }
@@ -718,7 +718,7 @@ kotlin复制代码GlobalScope.launch(Dispatchers.Main) {//开始协程：主线�
 协程上下文的数据结构特征更加显著，与List和Map非常类似。它包含用户定义的一些数据集合，这些数据与协程密切相关。它是一个有索引的 `Element` 实例集合。每个 `element` 在这个集合有一个唯一的 `Key` 。
 
 ```kotlin
-kotlin复制代码//协程的持久上下文。它是[Element]实例的索引集,这个集合中的每个元素都有一个唯一的[Key]。
+//协程的持久上下文。它是[Element]实例的索引集,这个集合中的每个元素都有一个唯一的[Key]。
 public interface CoroutineContext {
     //从这个上下文中返回带有给定[key]的元素或null。
     public operator fun <E : Element> get(key: Key<E>): E?
@@ -758,7 +758,7 @@ public interface CoroutineContext {
 #### CoroutineName
 
 ```kotlin
-kotlin复制代码//用户指定的协程名称。此名称用于调试模式。
+//用户指定的协程名称。此名称用于调试模式。
 public data class CoroutineName(
     //定义协程的名字
     val name: String
@@ -771,7 +771,7 @@ public data class CoroutineName(
 `CoroutineName` 是用户用来指定的协程名称的，用于方便调试和定位问题：
 
 ```kotlin
-kotlin复制代码GlobalScope.launch(CoroutineName("GlobalScope")) {
+GlobalScope.launch(CoroutineName("GlobalScope")) {
     launch(CoroutineName("CoroutineA")) {//指定协程名称
         val coroutineName = coroutineContext[CoroutineName]//获取协程名称
         print(coroutineName)
@@ -782,7 +782,7 @@ kotlin复制代码GlobalScope.launch(CoroutineName("GlobalScope")) {
 协程内部可以通过 `coroutineContext` 这个全局属性直接获取当前协程的上下文。打印数据如下：
 
 ```kotlin
-kotlin复制代码[DefaultDispatcher-worker-2] CoroutineName(CoroutineA)
+[DefaultDispatcher-worker-2] CoroutineName(CoroutineA)
 ```
 
 #### 上下文组合
@@ -790,7 +790,7 @@ kotlin复制代码[DefaultDispatcher-worker-2] CoroutineName(CoroutineA)
 从上面的协程创建的函数中可以看到，协程上下文的参数只有一个，但是怎么传递多个上下文元素呢？ `CoroutineContext` 可以使用 " + " 运算符进行合并。由于 `CoroutineContext` 是由一组元素组成的，所以加号右侧的元素会覆盖加号左侧的元素，进而组成新创建的 `CoroutineContext` 。
 
 ```kotlin
-kotlin复制代码GlobalScope.launch {
+GlobalScope.launch {
     //通过+号运算添加多个上下文元素
     var context = CoroutineName("协程1") + Dispatchers.Main
     print("context == $context")
@@ -806,7 +806,7 @@ kotlin复制代码GlobalScope.launch {
 注意：如果有重复的元素（ `key` 一致）则会右边的会代替左边的元素。打印数据如下：
 
 ```kotlin
-kotlin复制代码context == [CoroutineName(协程1), Dispatchers.Main]
+context == [CoroutineName(协程1), Dispatchers.Main]
 context == [CoroutineName(协程1), Dispatchers.IO]
 contextResult == Dispatchers.IO
 ```
@@ -854,7 +854,7 @@ contextResult == Dispatchers.IO
 Kotlin 使用堆栈帧来管理要运行哪个函数以及所有局部变量。 **挂起** (暂停)协程时，会复制并保存当前的堆栈帧以供稍后使用，将信息保存到 `Continuation` 对象中。 **恢复** 协程时，会将堆栈帧从其保存位置复制回来，对应的 `Continuation` 通过调用 `resumeWith` 函数才会恢复协程的执行，然后函数再次开始运行。同时返回 `Result<T>` 类型的成功或者异常的结果。
 
 ```kotlin
-kotlin复制代码//Continuation接口表示挂起点之后的延续，该挂起点返回类型为“T”的值。
+//Continuation接口表示挂起点之后的延续，该挂起点返回类型为“T”的值。
 public interface Continuation<in T> {
     //对应这个Continuation的协程上下文
     public val context: CoroutineContext
@@ -877,7 +877,7 @@ fun <T> Continuation<T>.resumeWithException(exception: Throwable): Unit =
 `Continuation` 类似于网络请求回调 `Callback` ，也是一个请求成功和一个请求失败的回调：
 
 ```java
-java复制代码public interface Callback {
+public interface Callback {
   //请求失败回调
   void onFailure(Call call, IOException e);
 
@@ -895,14 +895,14 @@ java复制代码public interface Callback {
 一个 `挂起函数` 要挂起，那么它必定得有一个 `挂起点` ，不然无法知道函数是否挂起，从哪挂起呢？
 
 ```kotlin
-kotlin复制代码@GET("users/{login}")
+@GET("users/{login}")
 suspend fun getUserSuspend(@Path("login") login: String): User
 ```
 
 **第一步** ：将上面的挂起函数解析成字节码： **通过AS的工具栏中 `Tools` -> `kotlin` -> `show kotlin ByteCode`**
 
 ```kotlin
-kotlin复制代码public abstract getUserSuspend(Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public abstract getUserSuspend(Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 ```
 
 上面的挂起函数本质是这样的，你会发现多了一个参数，这个参数就是 `Continuation` ，也就是说调用挂起函数的时候需要传递一个 `Continuation` 给它，只是传递这个参数是由编译器悄悄传，而不是我们传递的。这就是挂起函数为什么只能在协程或者其他挂起函数中执行，因为只有挂起函数或者协程中才有 `Continuation` 。
@@ -910,7 +910,7 @@ kotlin复制代码public abstract getUserSuspend(Ljava/lang/String;Lkotlin/corou
 **第二步** ：这里的 `Continuation` 参数，其实它类似 `CallBack` 回调函数， `resumeWith()` 就是成功或者失败回调的结果：
 
 ```kotlin
-kotlin复制代码public interface Continuation<in T> {
+public interface Continuation<in T> {
     //协程上下文
     public val context: CoroutineContext
 
@@ -922,7 +922,7 @@ kotlin复制代码public interface Continuation<in T> {
 **第三步** ：但是它是从哪里传进来的呢？这个函数只能在协程或者挂起函数中执行，说明 `Continuation` 很有可能是从协程充传入来的，查看协程构建的源码：
 
 ```kotlin
-kotlin复制代码public fun CoroutineScope.launch(): Job {
+public fun CoroutineScope.launch(): Job {
     val newContext = newCoroutineContext(context)
     val coroutine = if (start.isLazy)
         LazyStandaloneCoroutine(newContext, block) else
@@ -935,7 +935,7 @@ kotlin复制代码public fun CoroutineScope.launch(): Job {
 **第四步** ：通过 `launch` 启动一个协程的时候，他通过 `coroutine` 的 `start` 方法启动协程:
 
 ```kotlin
-kotlin复制代码public fun <R> start(start: CoroutineStart, receiver: R, block: suspend R.() -> T) {
+public fun <R> start(start: CoroutineStart, receiver: R, block: suspend R.() -> T) {
     initParentJob()
     start(block, receiver, this)
 }
@@ -944,7 +944,7 @@ kotlin复制代码public fun <R> start(start: CoroutineStart, receiver: R, block
 **第五步** ：然后 `start` 方法里面调用了 `CoroutineStart` 的 `invoke` ，这个时候我们发现了 `Continuation`:
 
 ```kotlin
-kotlin复制代码public operator fun <T> invoke(block: suspend () -> T, completion: Continuation<T>): Unit =
+public operator fun <T> invoke(block: suspend () -> T, completion: Continuation<T>): Unit =
     when (this) {
         DEFAULT -> block.startCoroutineCancellable(completion)
         ATOMIC -> block.startCoroutine(completion)
@@ -956,7 +956,7 @@ kotlin复制代码public operator fun <T> invoke(block: suspend () -> T, complet
 **第六步** ：而 `Continuation` 通过 `block.startCoroutine(completion)` 传入：
 
 ```kotlin
-kotlin复制代码public fun <T> (suspend () -> T).startCoroutine(completion: Continuation<T>) {
+public fun <T> (suspend () -> T).startCoroutine(completion: Continuation<T>) {
     createCoroutineUnintercepted(completion).intercepted().resume(Unit)
 }
 ```
@@ -968,7 +968,7 @@ kotlin复制代码public fun <T> (suspend () -> T).startCoroutine(completion: Co
 **任何一个协程体或者挂起函数中都隐含有一个 `Continuation` 实例，编译器能够对这个实例进行正确的传递，并将这个细节隐藏在协程的背后，让我们的异步代码看起来像同步代码一样。**
 
 ```kotlin
-kotlin复制代码@GET("users/{login}")
+@GET("users/{login}")
 suspend fun getUserSuspend(@Path("login") login: String): User
 
 GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
@@ -982,14 +982,6 @@ GlobalScope.launch(Dispatchers.Main) {//开始协程：主线程
 在主线程进行的 **suspend** 和 **resume** 的两个操作， **既实现了将耗时任务交由后台线程完成，保障了主线程安全** ，也在不增加代码复杂度和保证代码可读性的前提下做到不阻塞主线程的执行。可以说，在 Android 平台上协程主要就用来解决异步和切换线程这两个问题。
 
 **这是从零到一搭建一个 `组件化 + 模块化 + 协程 + Flow + Jetpack + MVVM` 的App** ，项目地址： [github.com/suming77/Su…](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fsuming77%2FSumTea_Android "https://github.com/suming77/SumTea_Android")
-
-### 点关注，不迷路
-
----
-
-好了各位，以上就是这篇文章的全部内容了，很感谢您阅读这篇文章。我是suming，感谢各位的支持和认可，您的 **点赞** 就是我创作的最大动力。 **山水有相逢** ，我们下篇文章见！
-
-本人水平有限，文章难免会有错误，请批评指正，不胜感激 ！
 
 ## 参考链接：
 

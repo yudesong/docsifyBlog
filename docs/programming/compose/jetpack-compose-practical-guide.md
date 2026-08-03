@@ -29,7 +29,7 @@ Jetpack Compose是Google官方在2019年推出的UI框架，于2021年发布正�
 **在项目的 `build.gradle` （Module: app）文件中** ：
 
 ```groovy
-groovy 代码解读复制代码dependencies {
+dependencies {
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
@@ -60,7 +60,7 @@ ext {
 Compose中的“Hello World”示例非常简单。只需在 `setContent` 块中调用 `Text` 可组合函数即可：
 
 ```kotlin
-kotlin 代码解读复制代码import androidx.compose.material.Text
+import androidx.compose.material.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -89,7 +89,7 @@ fun DefaultPreview() {
 用于显示文本内容。可以设置字体、颜色、样式等。
 
 ```kotlin
-kotlin 代码解读复制代码Text(
+Text(
     text = "Hello, Compose!",
     color = Color.Blue,
     fontSize = 20.sp,
@@ -102,7 +102,7 @@ kotlin 代码解读复制代码Text(
 Compose 提供了多种按钮组件，例如 `Button` 和 `OutlinedButton` 。可以设置点击事件和样式。
 
 ```kotlin
-kotlin 代码解读复制代码Button(onClick = { /* TODO */ }) {
+Button(onClick = { /* TODO */ }) {
     Text("Click Me")
 }
 ```
@@ -112,7 +112,7 @@ kotlin 代码解读复制代码Button(onClick = { /* TODO */ }) {
 用于显示图片。Compose 支持通过 `painterResource` 加载本地资源图片，也可以结合 `Coil` 、 `Glide` 等库加载网络图片。
 
 ```kotlin
-kotlin 代码解读复制代码Image(
+Image(
     painter = painterResource(id = R.drawable.image),
     contentDescription = "Sample Image"
 )
@@ -123,7 +123,7 @@ kotlin 代码解读复制代码Image(
 用于输入文本的编辑框，类似于 EditText。
 
 ```kotlin
-kotlin 代码解读复制代码var text by remember { mutableStateOf("") }
+var text by remember { mutableStateOf("") }
 
 TextField(
     value = text,
@@ -137,7 +137,7 @@ TextField(
 Column 和 Row 是最常用的布局组件，分别实现了垂直和水平布局。它们类似于 LinearLayout。
 
 ```kotlin
-kotlin 代码解读复制代码Column(
+Column(
     modifier = Modifier
         .fillMaxSize()
         .padding(16.dp),
@@ -154,7 +154,7 @@ kotlin 代码解读复制代码Column(
 Box 类似于 FrameLayout，可以将多个组件叠加在一起。
 
 ```kotlin
-kotlin 代码解读复制代码Box(
+Box(
     modifier = Modifier
         .fillMaxSize()
         .background(Color.Gray),
@@ -169,13 +169,13 @@ kotlin 代码解读复制代码Box(
 ConstraintLayout 是一个高级布局组件，适合复杂布局需求。需要在 `build.gradle` 中添加依赖：
 
 ```gradle
-gradle 代码解读复制代码implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 ```
 
 使用示例：
 
 ```kotlin
-kotlin 代码解读复制代码ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+ConstraintLayout(modifier = Modifier.fillMaxSize()) {
     val (button, text) = createRefs()
 
     Button(
@@ -203,7 +203,7 @@ kotlin 代码解读复制代码ConstraintLayout(modifier = Modifier.fillMaxSize(
 Compose使用 `mutableStateOf` 函数来创建可观察的状态。当你使用 `by remember { mutableStateOf(...) }` 创建状态时，Compose会跟踪这个状态，并在其值发生变化时自动触发UI的重组。
 
 ```kotlin
-kotlin 代码解读复制代码var count by remember { mutableStateOf(0) }
+var count by remember { mutableStateOf(0) }
 ```
 
 这里， `count` 是一个可观察的状态，它的任何变化都会触发包含它的Composable的重组。
@@ -240,7 +240,7 @@ kotlin 代码解读复制代码var count by remember { mutableStateOf(0) }
 假设你正在开发一个计数器应用，其中包含增加和减少计数的按钮。你可以使用 `mutableStateOf` 来管理计数器的状态，并在按钮点击时更新该状态。Compose将自动检测到状态的变化，并重新渲染相关的UI部分。
 
 ```kotlin
-kotlin 代码解读复制代码@Composable
+@Composable
 fun CounterScreen() {
     var count by remember { mutableStateOf(0) }
 
@@ -262,54 +262,54 @@ fun CounterScreen() {
 
 Jetpack Compose通过其设计哲学和一系列内置机制，旨在提高UI渲染的性能。在Compose中，性能优化主要围绕减少不必要的计算和渲染操作展开。以下是一些关键的性能优化策略，结合代码示例进行说明。
 
-##### 1\. 减少不必要的重组
+##### 1. 减少不必要的重组
 
 Compose的UI更新机制基于状态的变化自动触发重组。然而，过多的重组会导致性能问题。为了减少不必要的重组，我们可以采取以下措施：
 
 - **使用 `remember` 缓存不变的数据** ： Compose中的 `remember` 函数可以帮助你缓存那些不需要在每次重组时都重新计算或创建的数据。
   ```kotlin
-  kotlin 代码解读复制代码val cachedData = remember { createExpensiveData() }
+  val cachedData = remember { createExpensiveData() }
   ```
 - **精确控制状态更新** ： 确保只有在真正需要时才更新状态，避免无谓的重组。
 - **利用 `distinctUntilChanged` 减少状态变化** ： 如果你使用的是响应式流（如Flow或LiveData），并且状态更新非常频繁，但UI不需要每次更新都响应，可以使用 `distinctUntilChanged` 来减少状态变化通知。
 
-##### 2\. 优化布局和渲染
+##### 2. 优化布局和渲染
 
 - **利用Intrinsic Measurement机制** ： Compose使用Intrinsic Measurement机制来自动计算组件的大小，这避免了传统Android开发中复杂的MeasureSpec计算和手动布局过程，从而提高了布局性能。
 - **使用 `LazyColumn` 和 `LazyRow` 处理长列表** ： 对于需要展示大量项目的列表或网格，使用 `LazyColumn` 和 `LazyRow` 可以显著提高性能，因为它们只渲染可视区域内的项。
   ```kotlin
-  kotlin 代码解读复制代码LazyColumn {
+  LazyColumn {
       items(items) { item ->
           ListItem(item)
       }
   }
   ```
 
-##### 3\. 合理使用remember和LaunchedEffect
+##### 3. 合理使用remember和LaunchedEffect
 
 - **`remember` 用于缓存** ： 如上所述， `remember` 用于缓存那些计算成本高昂或不会频繁变化的数据。
 - **`LaunchedEffect` 处理副作用** ： `LaunchedEffect` 用于执行副作用操作，如网络请求、动画启动等。与 `remember` 结合使用时，可以确保副作用操作只在必要时执行。
   ```kotlin
-  kotlin 代码解读复制代码LaunchedEffect(key1 = someState) {
+  LaunchedEffect(key1 = someState) {
       // 执行副作用操作，如网络请求
   }
   ```
 
-##### 4\. 避免深层嵌套布局
+##### 4. 避免深层嵌套布局
 
 尽量避免过深的布局嵌套，因为这会增加Compose在重组时的工作量。尽量使用扁平化的布局结构，或者通过自定义Composable来封装复杂的布局逻辑。
 
-##### 5\. 监控和分析性能
+##### 5. 监控和分析性能
 
 - **使用Android Studio的性能分析工具** ： Android Studio提供了强大的性能分析工具，如Layout Inspector和Profiler，可以帮助你分析和优化Compose应用的性能。
 - **关注CPU和GPU使用情况** ： 确保应用不会过度使用CPU或GPU资源，特别是在动画和复杂渲染操作中。
 
-##### 6\. 示例代码总结
+##### 6. 示例代码总结
 
 下面是一个简单的示例，展示了如何在Compose中结合使用 `remember` 、 `LazyColumn` 和 `LaunchedEffect` 来优化性能：
 
 ```kotlin
-kotlin 代码解读复制代码@Composable
+@Composable
 fun MyListScreen(items: List<Item>) {
     LazyColumn {
         items(items) { item ->
@@ -345,6 +345,4 @@ fun createExpensiveDataForItem(item: Item): Any {
 ### 七、总结
 
 Jetpack Compose为Android UI开发带来了革命性的变化。通过声明式的API和纯Kotlin代码，它极大地简化了UI开发过程，提高了开发效率和代码质量。随着Compose的不断发展和完善，它将成为未来Android UI开发的主流工具。希望本文能帮助您更好地理解和实践Jetpack Compose。
-
-作者：洞窝-罗奎
 

@@ -17,7 +17,7 @@ Kotlin是静态类型语言，所有表达式的类型在编译期已经确定�
 函数以关键字fun开始，函数名称紧随其后，如
 
 ```kotlin
-kotlin 代码解读复制代码fun max(a: Int, b: Int): Int {
+fun max(a: Int, b: Int): Int {
     return if (a > b) a else b
 }
 ```
@@ -27,7 +27,7 @@ kotlin 代码解读复制代码fun max(a: Int, b: Int): Int {
 如果函数体写在花括号中，称这个函数有代码块体。如果它直接返回一个表达式，称有表达式体，如下，
 
 ```kotlin
-kotlin 代码解读复制代码fun max(a: Int, b: Int): Int = if (a > b) a else b
+fun max(a: Int, b: Int): Int = if (a > b) a else b
 ```
 
 ### 2）变量
@@ -39,7 +39,7 @@ kotlin 代码解读复制代码fun max(a: Int, b: Int): Int = if (a > b) a else 
 使用$符连接变量，如下
 
 ```
-scss 代码解读复制代码println("Hello, $name!)
+println("Hello, $name!)
 println("Hello, ${name[0]}!)
 ```
 
@@ -48,7 +48,7 @@ println("Hello, ${name[0]}!)
 值对象：只有数据没有其他代码的类。如下
 
 ```kotlin
-kotlin 代码解读复制代码class Person(val name: String)
+class Person(val name: String)
 ```
 
 ### 1）属性
@@ -62,7 +62,7 @@ kotlin 代码解读复制代码class Person(val name: String)
 如下，自定义属性的getter，isSquare为只读属性，该属性值可变但不可设置，
 
 ```kotlin
-kotlin 代码解读复制代码class Rectangle(val height: Int, val width: Int) {
+class Rectangle(val height: Int, val width: Int) {
     val isSquare: Boolean
         get() {
             return height == width
@@ -79,7 +79,7 @@ kotlin 代码解读复制代码class Rectangle(val height: Int, val width: Int) 
 Kotlin使用enum class来声明枚举，还可以声明带属性的枚举类，如下，
 
 ```
-scss 代码解读复制代码enum class Color(val r:Int, val g: Int, val b:Int) {
+enum class Color(val r:Int, val g: Int, val b:Int) {
     RED(255, 0, 0),
     ORANGE(255, 165, 0),
     YELLOW(255, 255, 0),
@@ -99,7 +99,7 @@ scss 代码解读复制代码enum class Color(val r:Int, val g: Int, val b:Int) 
 when是一个有返回值的表达式，代码块中的最后一个表达式就是结果，如getMnemonic返回了when表达式，
 
 ```kotlin
-kotlin 代码解读复制代码fun getMnemonic(color: Color) =
+fun getMnemonic(color: Color) =
     when (color) {
         Color.RED -> "Richard"
         Color.ORANGE -> "Of"
@@ -118,7 +118,7 @@ when的参数可以使用任何对象。
 when可以不带参数，分支条件就是任意的布尔表达式，如下
 
 ```
-ini 代码解读复制代码fun mixOptimized(c1: Color, C2: Color) =
+fun mixOptimized(c1: Color, C2: Color) =
     when {
         (c1 == RED && c2 == YELLOW) ||
         (c1 == YELLOW && c2 == RED) -> ORANGE
@@ -152,7 +152,7 @@ ini 代码解读复制代码fun mixOptimized(c1: Color, C2: Color) =
 ..语法不仅可以创建数字区间，还可以创建字符区间；使用in可以迭代区间或集合，如
 
 ```kotlin
-kotlin 代码解读复制代码val binaryReps = TreeMap<Char, String>()
+val binaryReps = TreeMap<Char, String>()
 
 for (c in 'A'..'F') {
     val binary = Integer.toBinaryString(c.toInt())
@@ -169,7 +169,7 @@ binaryReps\[c\] = binary 等价于Java中binaryReps.put(c, binary)
 在迭代集合的同时跟踪当前项的下标，不需要创建一个单独的变量来存储下标并手动增加它，如
 
 ```erlang
-erlang 代码解读复制代码val list = arrayListOf("10", "11", "1001")
+val list = arrayListOf("10", "11", "1001")
 for ((index, element) in list.withIndex()) {
     println("&index: $element")
 }
@@ -208,7 +208,7 @@ Kotlin没有受检异常。
 要改变包含顶层函数的生成的类的名称，需要为这个文件添加@JvmName的注解，将其放到这个文件的开头，位于包名的前面，如
 
 ```
-less 代码解读复制代码@file:JvmName("StringFunctions")
+@file:JvmName("StringFunctions")
 package strings
 fun joinToString(...):String{...}
 ```
@@ -228,7 +228,7 @@ fun joinToString(...):String{...}
 使用关键字as来修改导入的类或者函数的名称：
 
 ```kotlin
-kotlin 代码解读复制代码import strings.lastChar as last
+import strings.lastChar as last
 val c = "Kotlin".last()
 ```
 
@@ -237,7 +237,7 @@ val c = "Kotlin".last()
 扩展函数是静态函数，它把调用对象作为了它的第一个参数。假设StringUtil.kt中有一个扩展函数lastChar，在Java中如下调用，
 
 ```
-ini 代码解读复制代码char c = StringUtil.lastChar("Java")
+char c = StringUtil.lastChar("Java")
 ```
 
 ### 3)扩展函数不可重写
@@ -251,7 +251,7 @@ ini 代码解读复制代码char c = StringUtil.lastChar("Java")
 和扩展函数一样，扩展属性也像接收者的一个普通的成员属性一样，必须定义getter函数，因为没有支持字段，因此没有默认的getter的实现，不可以初始化，因为没有地方存值，如
 
 ```kotlin
-kotlin 代码解读复制代码val String.lastChar: Char
+val String.lastChar: Char
     get() = get(length - 1)
 ```
 
@@ -268,7 +268,7 @@ kotlin 代码解读复制代码val String.lastChar: Char
 使用mapOf函数来创建map
 
 ```
-vbnet 代码解读复制代码val map = mapOf(1 to "one", 7 to "seven", 53 to "fifty-three")
+val map = mapOf(1 to "one", 7 to "seven", 53 to "fifty-three")
 ```
 
 to是一种特殊的函数调用，叫中缀调用，函数名直接放在目标对象名称和参数之间。
@@ -276,7 +276,7 @@ to是一种特殊的函数调用，叫中缀调用，函数名直接放在目标
 中缀调用可以和只有一个参数的函数一起使用，要允许使用中缀符号调用函数，需要使用infix修饰符来标记它，如对to的声明，
 
 ```kotlin
-kotlin 代码解读复制代码infix fun Any.to(other: Any) = Pair(this, other)
+infix fun Any.to(other: Any) = Pair(this, other)
 ```
 
 val (number, name) = 1 to "one"表示结构，将1解构到nunmber，"one"解构到name。
@@ -296,7 +296,7 @@ Kotlin提供了一些名为split的具有不同参数的重载的扩展函数，
 局部函数可以保持代码整洁及避免重复，如下 带重复的代码
 
 ```kotlin
-kotlin 代码解读复制代码class User(val id: Int, va; name: String, val address: String)
+class User(val id: Int, va; name: String, val address: String)
 
 fun saveUser(user: User) {
     if (user.name.isEmpty()) {
@@ -310,7 +310,7 @@ fun saveUser(user: User) {
 提取逻辑到扩展函数
 
 ```kotlin
-kotlin 代码解读复制代码class User(val id: Int, va; name: String, val address: String)
+class User(val id: Int, va; name: String, val address: String)
 
 fun User.validateBeforeSave() {
     fun validate(value: String, fieldName: String) {
@@ -334,7 +334,7 @@ fun saveUser(user: User) {
 Kotlin使用interface关键字声明一个Kotlin接口，可以包含抽象方法的定义和非抽象方法的实现，不能包含任何状态。接口的方法可以有一个默认实现，只需要一个方法体。如
 
 ```kotlin
-kotlin 代码解读复制代码interface Clickable {
+interface Clickable {
     fun click()
     fun showOff() = println("I'm clickable!")
 }
@@ -389,7 +389,7 @@ Kotlin中引用外部类实例与Java不同，需要啊使用this@Outer从Inner�
 密封类用法如下，作为密封类的表达式，
 
 ```kotlin
-kotlin 代码解读复制代码sealed class Expr {
+sealed class Expr {
     class Num(val value: Int) : Expr()
     class Sum(val left: Expr, val right: Expr) : Expr()
 }
@@ -418,13 +418,13 @@ fun eval(e: Expr): Int =
 可以像函数参数一样为构造方法参数声明一个默认值，如
 
 ```kotlin
-kotlin 代码解读复制代码class User(val nickname: String, val isSubscribed: Boolean = true)
+class User(val nickname: String, val isSubscribed: Boolean = true)
 ```
 
 可以显示地为某些构造方法参数标明名称，如
 
 ```
-ini 代码解读复制代码val carol = User("Carol", isSubscribed = false)
+val carol = User("Carol", isSubscribed = false)
 ```
 
 如果所有的构造方法参数都有默认值，编译器会生成一个额外的不带参数的构造方法来使用所有的默认值。
@@ -442,7 +442,7 @@ ini 代码解读复制代码val carol = User("Carol", isSubscribed = false)
 接口可以包含抽象属性声明。
 
 ```kotlin
-kotlin 代码解读复制代码class PrivateUser(override val nickname: String) : User
+class PrivateUser(override val nickname: String) : User
 
 class SubscribingUser(val email: String) : User {
     override val nickname: String
@@ -459,7 +459,7 @@ nickname在SubscribingUser中有一个自定义getter在每次访问时计算sub
 除了抽象属性声明外，接口还可以包含具有getter和setter的属性，只要它们没有引用一个支持字段（支持字段需要在接口中存储状态，而这是不允许的）。如
 
 ```kotlin
-kotlin 代码解读复制代码interface User {
+interface User {
     val email: String
     val nickname: String
         get() = email.substringBefore('@')
@@ -475,7 +475,7 @@ email属性必须在子类中重写，nickname可以被继承。
 属性有两种：1）存储值的属性；2）具有自定义访问器在每次访问时计算值的属性。结合这两种实现的例子如
 
 ```javascript
-javascript 代码解读复制代码class User(val name: String) {
+class User(val name: String) {
     var address: String = "unspecified"
         set(value: String) {
             println("""
@@ -495,7 +495,7 @@ javascript 代码解读复制代码class User(val name: String) {
 访问器的可见性默认与属性的可见性相同，如果需要可以通过在get和set关键字前放置可见性修饰符的方式来修改它。如，
 
 ```kotlin
-kotlin 代码解读复制代码class LengthCounter {
+class LengthCounter {
     var counter: Int = 0
         private set
 
@@ -518,7 +518,7 @@ Kotlin中的is检查是Java中的instanceof的模拟，用来检查一个值是�
 数据类：在类前面添加data修饰符，自动生成通用方法equals、hashCode、toString。如下，
 
 ```kotlin
-kotlin 代码解读复制代码data class Client(val name: String, val postalCode: Int)
+data class Client(val name: String, val postalCode: Int)
 ```
 
 没有在主构造方法中声明的属性将不会加入到相等性检查和哈希值计算中去。
@@ -548,7 +548,7 @@ c）对象表达式，用来代替Java的匿名内部类。
 Kotlin中的类不能拥有静态成员，伴生对象（与包级别函数和属性一起）替代了Java静态方法和字段定义。在类中定义的对象使用companion关键字来标记，就获得了直接通过容器类名称来访问这个对象的方法和属性的能力，不再需要显示地指明对象的名称。如下，
 
 ```kotlin
-kotlin 代码解读复制代码class A {
+class A {
     companion object {
         fun bar() {
         }
@@ -561,7 +561,7 @@ kotlin 代码解读复制代码class A {
 伴生对象可以访问类中的所有private成员，包括private构造方法，是实现工厂模式的理想选择，如下用工厂方法创建新用户，确保每一个email都与一个唯一的User实例对应，
 
 ```kotlin
-kotlin 代码解读复制代码class User private constructor(val nickname: String) {
+class User private constructor(val nickname: String) {
     companion object {
         fun newSubscribingUser(email: String) =
             User(email.substringBefore('@'))
@@ -585,7 +585,7 @@ kotlin 代码解读复制代码class User private constructor(val nickname: Stri
 object用来声明匿名对象时，替代了Java中的匿名内部类的用法，并增加了如实现多个接口的能力和修改在创建对象的作用域中定义的变量的能力等。匿名内部类如下，
 
 ```kotlin
-kotlin 代码解读复制代码window.addMouseListener(
+window.addMouseListener(
     object : MouseAdapter() {
         override fun mouseClicked(e: MouseEvent) {
         }
@@ -602,7 +602,7 @@ kotlin 代码解读复制代码window.addMouseListener(
 在对象表达式中的代码可以访问创建它的函数中的变量，访问没有被显示在final变量，还可以在对象表达式中修改变量的值，如
 
 ```kotlin
-kotlin 代码解读复制代码fun countClicks(window: Window) {
+fun countClicks(window: Window) {
     var clickCount = 0
 
     window.addMouseListener(object : MouseAdapter() {

@@ -17,7 +17,7 @@ MMKV 是基于 mmap 内存映射文件，使用 protobuf 编码协议，提供 k
 MMKV 的核心数据结构围绕着内存映射文件展开。在其源码中，关键的数据结构定义如下：
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // MMKV 主类，负责管理内存映射文件和数据操作
 class MMKV {
 public:
@@ -64,7 +64,7 @@ private:
 上述代码定义了 MMKV 类，它包含了与内存映射文件交互的核心成员变量和方法。 `m_fd` 表示文件描述符， `m_ptr` 指向内存映射后的地址， `m_size` 和 `m_usedSize` 分别记录了 MMKV 的总大小和已使用大小。 `MMKVHeader` 结构体用于存储数据存储的头部信息，如版本号、数据偏移量等。
 
 ```cpp
-cpp 代码解读复制代码// MMKVHeader.cpp
+// MMKVHeader.cpp
 // MMKV 数据存储的头部信息结构体
 struct MMKVHeader {
     // 魔数，用于标识文件是 MMKV 文件
@@ -87,7 +87,7 @@ struct MMKVHeader {
 在 Android 中，mmap 函数用于将一个文件或者其它对象映射进内存。MMKV 利用 mmap 实现高效的内存管理，其核心调用代码如下：
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 初始化 MMKV 时进行内存映射
 MMKV::MMKV(const std::string &path, size_t size) {
     // 打开文件，如果文件不存在则创建
@@ -142,7 +142,7 @@ MMKV::MMKV(const std::string &path, size_t size) {
 当 MMKV 中存储的数据不断增加，已有的内存空间不足时，需要对内存映射文件进行动态扩展。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 确保内存映射文件大小足够，不足时进行扩展
 void MMKV::ensureSize(size_t needSize) {
     if (m_usedSize + needSize <= m_size) {
@@ -180,7 +180,7 @@ void MMKV::ensureSize(size_t needSize) {
 MMKV 使用 protobuf 编码协议对数据进行编码存储，以提高存储效率和空间利用率。在存储数据时，会先将数据进行编码，然后写入内存映射文件。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 写入数据到内存映射文件，并更新相关信息
 void MMKV::writeData(const void *value, size_t size, const std::string &key) {
     pthread_mutex_lock(&m_mutex);
@@ -224,7 +224,7 @@ void MMKV::writeData(const void *value, size_t size, const std::string &key) {
 MMKV 在内存分配上采用了一种简单而有效的策略，避免了复杂的内存分配算法带来的额外开销。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 确保内存映射文件大小足够，不足时进行扩展
 void MMKV::ensureSize(size_t needSize) {
     //...（前面已解释）
@@ -245,7 +245,7 @@ void MMKV::ensureSize(size_t needSize) {
 当用户删除 MMKV 中的某个数据时，MMKV 需要回收相应的内存空间。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 目前暂未实现数据删除功能，这里仅为示意
 // 实际实现中，需要找到对应 key 的数据位置，进行内存回收
 void MMKV::remove(const std::string &key) {
@@ -291,7 +291,7 @@ void MMKV::remove(const std::string &key) {
 虽然 MMKV 通过简单的内存分配和回收策略减少了内存碎片的产生，但随着数据的频繁增删改，仍然可能会产生一定的内存碎片。为了提高内存使用效率，MMKV 可以采用一些简单的内存碎片整理策略。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 简单的内存碎片整理函数示意
 void MMKV::compact() {
     pthread_mutex_lock(&m_mutex);
@@ -341,7 +341,7 @@ void MMKV::compact() {
 在多线程环境下，为了保证数据的一致性和正确性，MMKV 使用互斥锁来控制对内存映射文件的访问。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // MMKV 类中的互斥锁成员变量
 pthread_mutex_t m_mutex;
 
@@ -433,7 +433,7 @@ void MMKV::batchWrite(const std::vector<BatchWriteData>& dataList) {
 在数据读取方面，也采用类似思路，当需要读取多个数据时，尽量从内存映射文件中一次性读取多个数据所需的连续内存区域，再进行解析。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 批量读取数据的函数
 std::vector<BatchWriteData> MMKV::batchRead(const std::vector<std::string>& keyList) {
     pthread_mutex_lock(&m_mutex);
@@ -479,7 +479,7 @@ std::vector<BatchWriteData> MMKV::batchRead(const std::vector<std::string>& keyL
 MMKV为了进一步提升读写性能，引入了简单的缓存机制。它会在内存中缓存最近读取或写入的数据，当下次需要访问相同数据时，直接从缓存中获取，避免再次从内存映射文件中读取。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 数据缓存的结构体
 struct DataCache {
     std::string key;
@@ -532,7 +532,7 @@ void MMKV::putIntoCache(const std::string& key, const void* value, size_t size) 
 在实际读写操作中，MMKV会优先尝试从缓存中获取数据，只有在缓存未命中时，才从内存映射文件中读取数据，并将读取的数据存入缓存；在数据写入后，也会将新写入的数据存入缓存。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 改进后的读取数据函数，加入缓存机制
 size_t MMKV::readData(const std::string& key, void* value, size_t size) const {
     pthread_mutex_lock(&m_mutex);
@@ -581,7 +581,7 @@ size_t MMKV::readData(const std::string& key, void* value, size_t size) const {
 MMKV通过在 `MMKVHeader` 中记录版本号来管理数据的版本。当MMKV的存储格式发生变化时，通过版本号来判断是否需要进行数据迁移或兼容处理。
 
 ```cpp
-cpp 代码解读复制代码// MMKVHeader.cpp
+// MMKVHeader.cpp
 // MMKV 数据存储的头部信息结构体
 struct MMKVHeader {
     // 魔数，用于标识文件是 MMKV 文件
@@ -624,7 +624,7 @@ MMKV::MMKV(const std::string& path, size_t size) {
 当检测到数据版本过低时，MMKV需要将旧版本的数据迁移到新版本的存储格式。数据迁移过程需要保证数据的完整性和一致性。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 数据迁移函数
 void MMKV::performDataMigration() {
     std::vector<BatchWriteData> migratedData;
@@ -671,7 +671,7 @@ void MMKV::performDataMigration() {
 Android系统有着自己的内存管理机制，MMKV在使用内存映射文件时，需要与Android系统的内存管理进行良好的协同。在Android中，当系统内存紧张时，会触发内存回收机制。MMKV通过合理设置内存映射的属性，使得在内存回收时能够尽量减少对自身数据的影响。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 进行内存映射
 m_ptr = mmap(nullptr, m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
 if (m_ptr == MAP_FAILED) {
@@ -686,7 +686,7 @@ if (m_ptr == MAP_FAILED) {
 同时，MMKV会根据Android系统的内存状态，合理调整自身的内存使用。例如，当检测到系统内存紧张时，MMKV可以适当缩小缓存大小，释放一部分内存空间，以配合系统的内存管理。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 检查系统内存状态并调整缓存大小的函数
 void MMKV::adjustCacheAccordingToSystemMemory() {
     // 获取系统可用内存（这里只是示例，实际获取方式可能更复杂）
@@ -729,7 +729,7 @@ size_t MMKV::readData(const std::string& key, void* value, size_t size) const {
 MMKV需要感知Android应用的生命周期，在应用不同的生命周期阶段进行相应的内存管理操作，以优化性能和资源占用。
 
 ```java
-java 代码解读复制代码// MMKVHelper.java (假设的Java辅助类，用于与MMKV的C++部分交互)
+// MMKVHelper.java (假设的Java辅助类，用于与MMKV的C++部分交互)
 import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.res.Configuration;
@@ -762,7 +762,7 @@ public class MMKVHelper {
 在MMKV的内存管理过程中，涉及大量的系统调用，如 `open` 、 `mmap` 、 `ftruncate` 等。这些系统调用可能会因为各种原因（如文件权限不足、磁盘空间满等）而失败，MMKV通过完善的错误处理机制来保证程序的稳定性。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // MMKV 初始化时的文件打开操作及错误处理
 MMKV::MMKV(const std::string &path, size_t size) {
     // 打开文件，如果文件不存在则创建
@@ -824,7 +824,7 @@ MMKV::MMKV(const std::string &path, size_t size) {
 在多线程环境下或者数据读写过程中，可能会出现数据不一致的情况。MMKV通过多种方式来保障数据的一致性。除了前面提到的互斥锁机制，在数据写入和读取过程中，还会进行数据校验。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 写入数据时添加简单的数据校验（示例：校验数据长度是否合理）
 void MMKV::writeData(const void *value, size_t size, const std::string &key) {
     pthread_mutex_lock(&m_mutex);
@@ -906,7 +906,7 @@ size_t MMKV::readData(const std::string &key, void *value, size_t size) const {
 MMKV为了更好地了解自身内存管理的性能状况，会采集一些关键的性能指标。这些指标包括内存分配次数、内存释放次数、数据读写耗时等。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // MMKV 类中新增性能指标相关成员变量
 size_t m_memoryAllocationCount; // 内存分配次数
 size_t m_memoryDeallocationCount; // 内存释放次数
@@ -987,7 +987,7 @@ void MMKV::writeData(const void *value, size_t size, const std::string &key) {
 基于采集到的性能指标，MMKV可以制定相应的性能调优策略。例如，如果发现内存分配次数过多，可能是内存分配粒度不合理，可以尝试调整内存扩展的策略；如果数据读写耗时较长，可以进一步优化缓存机制或数据编码方式。
 
 ```cpp
-cpp 代码解读复制代码// MMKV.cpp
+// MMKV.cpp
 // 根据性能指标调整内存扩展策略的示例函数
 void MMKV::optimizeMemoryAllocation() {
     // 如果内存分配次数在一定时间内过高
