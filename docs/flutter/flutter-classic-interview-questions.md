@@ -8,33 +8,43 @@ Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Andro
 
 在研究了Hybrid APP、React Native和Weex等技术之后，为在今年的早些时候也入了Flutter的坑。总的来说，不管是从社群和社区的活跃来看，还是从技术的水准上来看，Flutter无疑是最优秀的，特别是Google将Flutter列为重点推广项目之后，全世界掀起了一股学习Flutter的热潮。
 
-### Dart 基础
+## 一、Dart 语法基础
 
-**1. Dart 当中的 「..」表示什么意思？** 
+### 1. Dart 当中的 「..」表示什么意思？
 
-Dart 当中的 「..」意思是 「级联操作符」，为了方便配置而使用。「..」和「.」不同的是 调用「..」后返回的相当于是 this，而「.」返回的则是该方法返回的值 
+Dart 当中的 「..」意思是 「级联操作符」，为了方便配置而使用。「..」和「.」不同的是 调用「..」后返回的相当于是 this，而「.」返回的则是该方法返回的值
 
 ---
 
-**2. Dart 的作用域** 
+### 2. Dart 的作用域
 
 Dart 没有 「public」「private」等关键字，默认就是公开的，私有变量使用 下划线 _开头。
 
 ---
 
-**3. Dart 是不是单线程模型？是如何运行的？**  
+### 9. 说一下 mixin机制？
+
+mixin 是Dart 2.1 加入的特性，以前版本通常使用abstract class代替。简单来说，mixin是为了解决继承方面的问题而引入的机制，Dart为了支持多重继承，引入了mixin关键字，它最大的特殊处在于：mixin定义的类不能有构造方法，这样可以避免继承多个类而产生的父类构造方法冲突。
+
+mixins的对象是类，mixins绝不是继承，也不是接口，而是一种全新的特性，可以mixins多个类，mixins的使用需要满足一定条件。
+
+---
+
+## 二、Dart 线程与并发模型
+
+### 3. Dart 是不是单线程模型？是如何运行的？
 
 Dart 是单线程模型，运行的的流程如下图。
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a1d52d9d02df489fa25bbde346daf66d~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
 
-简单来说，Dart 在单线程中是以消息循环机制来运行的，包含两个任务队列，一个是“微任务队列” microtask queue，另一个叫做“事件队列” event queue。
+简单来说，Dart 在单线程中是以消息循环机制来运行的，包含两个任务队列，一个是"微任务队列" microtask queue，另一个叫做"事件队列" event queue。
 
 当Flutter应用启动后，消息循环机制便启动了。首先会按照先进先出的顺序逐个执行微任务队列中的任务，当所有微任务队列执行完后便开始执行事件队列中的任务，事件任务执行完毕后再去执行微任务，如此循环往复，生生不息。
 
 ---
 
-**4. Dart 是如何实现多任务并行的？** 
+### 4. Dart 是如何实现多任务并行的？
 
 前面说过， Dart 是单线程的，不存在多线程，那如何进行多任务并行的呢？其实，Dart的多线程和前端的多线程有很多的相似之处。Flutter的多线程主要依赖Dart的并发编程、异步和事件驱动机制。
 
@@ -42,7 +52,7 @@ Dart 是单线程模型，运行的的流程如下图。
 
 简单的说，在Dart中，一个Isolate对象其实就是一个isolate执行环境的引用，一般来说我们都是通过当前的isolate去控制其他的isolate完成彼此之间的交互，而当我们想要创建一个新的Isolate可以使用Isolate.spawn方法获取返回的一个新的isolate对象，两个isolate之间使用SendPort相互发送消息，而isolate中也存在了一个与之对应的ReceivePort接受消息用来处理，但是我们需要注意的是，ReceivePort和SendPort在每个isolate都有一对，只有同一个isolate中的ReceivePort才能接受到当前类的SendPort发送的消息并且处理。
 
-方案 1：Flutter compute（最简单，推荐入门）
+#### 方案 1：Flutter compute（最简单，推荐入门）
 >底层封装：Isolate.spawn + ReceivePort，自动处理消息、自动销毁隔离单元
 >⚠️ 限制：只能一次入参、一次返回结果，不支持持续交互
 
@@ -66,12 +76,13 @@ Future<void> runComputeDemo() async {
   print("计算结果：$result");
 }
 ```
-⚠️ compute 高频踩坑
+
+#### compute 高频踩坑
 1. 计算函数不能是类成员方法（无法序列化闭包），必须顶层函数 /static；
 2. 传入和返回的数据必须是可序列化对象：基础类型、List、Map；不能携带 Widget、Context、SendPort 以外的 dart 对象；
 3. 每次调用 compute 会新建 + 销毁 Isolate，高频循环调用有性能开销，高频任务建议使用原生 spawn 复用 Isolate。
 
-方案 2：原生 Isolate.spawn（灵活，支持双向持续通信）
+#### 方案 2：原生 Isolate.spawn（灵活，支持双向持续通信）
 >适合场景：多次下发计算任务、持续传回进度、流式数据。
 >流程模型：
 >主 Isolate 创建 ReceivePort，用于接收子 Isolate 消息
@@ -80,7 +91,7 @@ Future<void> runComputeDemo() async {
 >主 Isolate 监听 ReceivePort 获取数据
 >任务结束手动关闭端口、销毁 Isolate 释放内存
 
-完整示例（单次任务）
+#### 完整示例（单次任务）
 
 ```dart
 import 'dart:isolate';
@@ -113,15 +124,17 @@ Future<void> basicIsolateDemo() async {
 
 ---
 
-**5. 说一下Dart异步编程中的 Future关键字？** 
+## 三、Dart 异步编程
 
-前面说过，Dart 在单线程中是以消息循环机制来运行的，其中包含两个任务队列，一个是“微任务队列” microtask queue，另一个叫做“事件队列” event queue。
+### 5. 说一下Dart异步编程中的 Future关键字？
+
+前面说过，Dart 在单线程中是以消息循环机制来运行的，其中包含两个任务队列，一个是"微任务队列" microtask queue，另一个叫做"事件队列" event queue。
 
 在Java并发编程开发中，经常会使用Future来处理异步或者延迟处理任务等操作。而在Dart中，执行一个异步任务同样也可以使用Future来处理。在 Dart 的每一个 Isolate 当中，执行的优先级为 ：Main > MicroTask > EventQueue。
 
 ---
 
-**6. 说一下Dart异步编程中的 Stream数据流？** 
+### 6. 说一下Dart异步编程中的 Stream数据流？
 
 在Dart中，Stream 和 Future 一样，都是用来处理异步编程的工具。它们的区别在于，Stream 可以接收多个异步结果，而Future 只有一个。 Stream 的创建可以使用 Stream.fromFuture，也可以使用 StreamController 来创建和控制。还有一个注意点是：普通的 Stream 只可以有一个订阅者，如果想要多订阅的话，要使用 asBroadcastStream()。
 
@@ -129,7 +142,6 @@ Stream 监听后能收到三类通知：
 1. onData：正常数据
 2. onError：异常
 3. onDone：流关闭，传输结束
-
 
 ```dart
 stream.listen(
@@ -147,40 +159,35 @@ var sub1 = stream.listen(print);
 ```
 >⚠️ 重点：listen () 才会启动流！不监听，很多流不会产生数据（惰性）
 
-
-
-
 ---
 
-**7. Stream 有哪两种订阅模式？分别是怎么调用的？**
+### 7. Stream 有哪两种订阅模式？分别是怎么调用的？
 
 Stream有两种订阅模式：单订阅(single) 和 多订阅（broadcast）。单订阅就是只能有一个订阅者，而广播是可以有多个订阅者。这就有点类似于消息服务（Message Service）的处理模式。单订阅类似于点对点，在订阅者出现之前会持有数据，在订阅者出现之后就才转交给它。而广播类似于发布订阅模式，可以同时有多个订阅者，当有数据时就会传递给所有的订阅者，而不管当前是否已有订阅者存在。
 
 Stream 默认处于单订阅模式，所以同一个 stream 上的 listen 和其它大多数方法只能调用一次，调用第二次就会报错。但 Stream 可以通过 transform() 方法（返回另一个 Stream）进行连续调用。通过 Stream.asBroadcastStream() 可以将一个单订阅模式的 Stream 转换成一个多订阅模式的 Stream，isBroadcast 属性可以判断当前 Stream 所处的模式。
 
-**8. await for 如何使用？** await for是不断获取stream流中的数据，然后执行循环体中的操作。它一般用在直到stream什么时候完成，并且必须等待传递完成之后才能使用，不然就会一直阻塞。
+---
+
+### 8. await for 如何使用？
+
+await for是不断获取stream流中的数据，然后执行循环体中的操作。它一般用在直到stream什么时候完成，并且必须等待传递完成之后才能使用，不然就会一直阻塞。
 
 ```dart
-Stream<String> stream = new Stream<String>.fromIterable(['不开心', '面试', '没', '过']); 
+Stream<String> stream = new Stream<String>.fromIterable(['不开心', '面试', '没', '过']);
 
-main() async { 
-    wait for(String s in stream) { 
-        print(s); 
-    } 
+main() async {
+    wait for(String s in stream) {
+        print(s);
+    }
 }
 ```
 
-**9. 说一下 mixin机制？** 
-
-mixin 是Dart 2.1 加入的特性，以前版本通常使用abstract class代替。简单来说，mixin是为了解决继承方面的问题而引入的机制，Dart为了支持多重继承，引入了mixin关键字，它最大的特殊处在于：mixin定义的类不能有构造方法，这样可以避免继承多个类而产生的父类构造方法冲突。
-
-mixins的对象是类，mixins绝不是继承，也不是接口，而是一种全新的特性，可以mixins多个类，mixins的使用需要满足一定条件。
-
 ---
 
-### Flutter 基础部分
+## 四、Flutter 框架总览
 
-**1. 请简单介绍下Flutter框架，以及它的优缺点？** 
+### 1. 请简单介绍下Flutter框架，以及它的优缺点？
 
 Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Android、iOS和Web平台上构建高质量的原生用户界面。同时，Flutter还是Google新研发的Fuchsia操作系统的默认开发套件。在全世界，Flutter正在被越来越多的开发者和组织使用，并且Flutter是完全免费、开源的。Flutter采用现代响应式框架构建，其中心思想是使用组件来构建应用的UI。当组件的状态发生改变时，组件会重构它的描述，Flutter会对比之前的描述，以确定底层渲染树从当前状态转换到下一个状态所需要的最小更改。
 
@@ -198,7 +205,7 @@ Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Andro
 
 ---
 
-**2. 介绍下Flutter的理念架构** 
+### 2. 介绍下Flutter的理念架构
 
 其实也就是下面这张图。
 
@@ -208,7 +215,7 @@ Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Andro
 
 ---
 
-**3. 介绍下FFlutter的FrameWork层和Engine层，以及它们的作用**
+### 3. 介绍下FFlutter的FrameWork层和Engine层，以及它们的作用
 
 Flutter的FrameWork层是用Drat编写的框架（SDK），它实现了一套基础库，包含Material（Android风格UI）和Cupertino（iOS风格）的UI界面，下面是通用的Widgets（组件），之后是一些动画、绘制、渲染、手势库等。这个纯 Dart实现的 SDK被封装为了一个叫作 dart:ui的 Dart库。我们在使用 Flutter写 App的时候，直接导入这个库即可使用组件等功能。
 
@@ -216,35 +223,27 @@ Flutter的Engine层是Skia 2D的绘图引擎库，其前身是一个向量绘图
 
 ---
 
-**4. 介绍下Widget、State、Context 概念**
+## 五、Flutter 核心概念
+
+### 4. 介绍下Widget、State、Context 概念
 
 - **Widget**：在Flutter中，几乎所有东西都是Widget。将一个Widget想象为一个可视化的组件（或与应用可视化方面交互的组件），当你需要构建与布局直接或间接相关的任何内容时，你正在使用Widget。
 - **Widget树**：Widget以树结构进行组织。包含其他Widget的widget被称为父Widget(或widget容器)。包含在父widget中的widget被称为子Widget。
 - **Context**：仅仅是已创建的所有Widget树结构中的某个Widget的位置引用。简而言之，将context作为widget树的一部分，其中context所对应的widget被添加到此树中。一个context只从属于一个widget，它和widget一样是链接在一起的，并且会形成一个context树。
-- **State**：定义了StatefulWidget实例的行为，它包含了用于”交互/干预“Widget信息的行为和布局。应用于State的任何更改都会强制重建Widget。
+- **State**：定义了StatefulWidget实例的行为，它包含了用于"交互/干预"Widget信息的行为和布局。应用于State的任何更改都会强制重建Widget。
 
 ---
 
-**5. 简述Widget的StatelessWidget和StatefulWidget两种状态组件类**
+### 5. 简述Widget的StatelessWidget和StatefulWidget两种状态组件类
 
 - **StatelessWidget**: 一旦创建就不关心任何变化，在下次构建之前都不会改变。它们除了依赖于自身的配置信息（在父节点构建时提供）外不再依赖于任何其他信息。比如典型的Text、Row、Column、Container等，都是StatelessWidget。它的生命周期相当简单：初始化、通过build()渲染。
 - **StatefulWidget**: 在生命周期内，该类Widget所持有的数据可能会发生变化，这样的数据被称为State，这些拥有动态内部数据的Widget被称为StatefulWidget。比如复选框、Button等。State会与Context相关联，并且此关联是永久性的，State对象将永远不会改变其Context，即使可以在树结构周围移动，也仍将与该context相关联。当state与context关联时，state被视为已挂载。StatefulWidget由两部分组成，在初始化时必须要在createState()时初始化一个与之相关的State对象。
 
 ---
 
-**6. StatefulWidget 的生命周期** Flutter的Widget分为StatelessWidget和StatefulWidget两种。其中，StatelessWidget是无状态的，StatefulWidget是有状态的，因此实际使用时，更多的是StatefulWidget。StatefulWidget的生命周期如下图。
+### 7. 简述Widgets、RenderObjects 和 Elements的关系
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/06943d7b439f41fea821b7892650f01b~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
-
-- **initState()**：Widget 初始化当前 State，在当前方法中是不能获取到 Context 的，如想获取，可以试试 Future.delayed()
-- **didChangeDependencies()**：在 initState() 后调用，State对象依赖关系发生变化的时候也会调用。
-- **deactivate()**：当 State 被暂时从视图树中移除时会调用这个方法，页面切换时也会调用该方法，和Android里的 onPause 差不多。
-- **dispose()**：Widget 销毁时调用。
-- **didUpdateWidget**：Widget 状态发生变化的时候调用。
-
----
-
-**7. 简述Widgets、RenderObjects 和 Elements的关系** 首先看一下这几个对象的含义及作用。
+首先看一下这几个对象的含义及作用。
 
 - **Widget** ：仅用于存储渲染所需要的信息。
 - **RenderObject** ：负责管理布局、绘制等操作。
@@ -256,7 +255,23 @@ Widget会被inflate（填充）到Element，并由Element管理底层渲染树�
 
 ---
 
-**8. 什么是状态管理，你了解哪些状态管理框架？** 
+## 六、Flutter 生命周期与状态管理
+
+### 6. StatefulWidget 的生命周期
+
+Flutter的Widget分为StatelessWidget和StatefulWidget两种。其中，StatelessWidget是无状态的，StatefulWidget是有状态的，因此实际使用时，更多的是StatefulWidget。StatefulWidget的生命周期如下图。
+
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/06943d7b439f41fea821b7892650f01b~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+- **initState()**：Widget 初始化当前 State，在当前方法中是不能获取到 Context 的，如想获取，可以试试 Future.delayed()
+- **didChangeDependencies()**：在 initState() 后调用，State对象依赖关系发生变化的时候也会调用。
+- **deactivate()**：当 State 被暂时从视图树中移除时会调用这个方法，页面切换时也会调用该方法，和Android里的 onPause 差不多。
+- **dispose()**：Widget 销毁时调用。
+- **didUpdateWidget**：Widget 状态发生变化的时候调用。
+
+---
+
+### 8. 什么是状态管理，你了解哪些状态管理框架？
 
 Flutter中的状态和前端React中的状态概念是一致的。React框架的核心思想是组件化，应用由组件搭建而成，组件最重要的概念就是状态，状态是一个组件的UI数据模型，是组件渲染时的数据依据。
 
@@ -264,7 +279,9 @@ Flutter的状态可以分为全局状态和局部状态两种。常用的状态�
 
 ---
 
-**9. 简述Flutter的绘制流程**
+## 七、Flutter 渲染与线程
+
+### 9. 简述Flutter的绘制流程
 
 Flutter的绘制流程如下图所示。
 
@@ -274,7 +291,7 @@ Flutter只关心向 GPU提供视图数据，GPU的 VSync信号同步到 UI线程
 
 ---
 
-**10. 简述Flutter的线程管理模型** 
+### 10. 简述Flutter的线程管理模型
 
 默认情况下，Flutter Engine层会创建一个Isolate，并且Dart代码默认就运行在这个主Isolate上。必要时可以使用spawnUri和spawn两种方式来创建新的Isolate，在Flutter中，新创建的Isolate由Flutter进行统一的管理。 事实上，Flutter Engine自己不创建和管理线程，Flutter Engine线程的创建和管理是Embeder负责的，Embeder指的是将引擎移植到平台的中间层代码，Flutter Engine层的架构示意图如下图所示。
 
@@ -284,7 +301,11 @@ Flutter只关心向 GPU提供视图数据，GPU的 VSync信号同步到 UI线程
 
 ---
 
-**11. Flutter 是如何与原生Android、iOS进行通信的？** Flutter 通过 PlatformChannel 与原生进行交互，其中 PlatformChannel 分为三种：
+## 八、Flutter 通信与热重载
+
+### 11. Flutter 是如何与原生Android、iOS进行通信的？
+
+Flutter 通过 PlatformChannel 与原生进行交互，其中 PlatformChannel 分为三种：
 
 - **BasicMessageChannel** ：用于传递字符串和半结构化的信息。
 - **MethodChannel** ：用于传递方法调用（method invocation）。
@@ -294,7 +315,7 @@ Flutter只关心向 GPU提供视图数据，GPU的 VSync信号同步到 UI线程
 
 ---
 
-**12. 简述Flutter 的热重载** 
+### 12. 简述Flutter 的热重载
 
 Flutter 的热重载是基于 JIT 编译模式的代码增量同步。由于 JIT 属于动态编译，能够将 Dart 代码编译成生成中间代码，让 Dart VM 在运行时解释执行，因此可以通过动态更新中间代码实现增量同步。
 
@@ -303,4 +324,3 @@ Flutter 的热重载是基于 JIT 编译模式的代码增量同步。由于 JIT
 另一方面，由于涉及到状态的保存与恢复，涉及状态兼容与状态初始化的场景，热重载是无法支持的，如改动前后 Widget 状态无法兼容、全局变量与静态属性的更改、main 方法里的更改、initState 方法里的更改、枚举和泛型的更改等。
 
 可以发现，热重载提高了调试 UI 的效率，非常适合写界面样式这样需要反复查看修改效果的场景。但由于其状态保存的机制所限，热重载本身也有一些无法支持的边界。
-
