@@ -11,3 +11,4 @@
   * [Flutter 基础部分(二)](/flutter/flutter-state-management.md)
   * [Flutter 基础部分(三)](/flutter/flutter-compilation-startup-image.md)
   * [Flutter 基础部分(四)](/flutter/flutter-rendering-performance.md)
+  * [Flutter 基础部分(五)](/flutter/flutter-performance-stability.md)
