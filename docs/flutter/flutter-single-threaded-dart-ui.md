@@ -388,15 +388,10 @@ void futureDoWhile(){
 }
 //输出结果：
 5
-
 1
-
 3
-
 2
-
 12
-
 null
 ```
 

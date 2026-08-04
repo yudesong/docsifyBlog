@@ -8,8 +8,6 @@ Flutter是Google推出的一套开源跨平台UI框架，可以快速地在Andro
 
 在研究了Hybrid APP、React Native和Weex等技术之后，为在今年的早些时候也入了Flutter的坑。总的来说，不管是从社群和社区的活跃来看，还是从技术的水准上来看，Flutter无疑是最优秀的，特别是Google将Flutter列为重点推广项目之后，全世界掀起了一股学习Flutter的热潮。
 
-在国内，除了阿里、腾讯、美团等大厂外，国内很多的中小团队也开始使用Flutter来作为移动应用开发的首选，并且很多公司在移动招聘方面也要求具有Flutter开发的背景。Flutter 的面试题主要分为两个Dart和Flutter部分，下面是一些常见的面试题。
-
 ### Dart 基础
 
 **1. Dart 当中的 「..」表示什么意思？** 
@@ -44,6 +42,75 @@ Dart 是单线程模型，运行的的流程如下图。
 
 简单的说，在Dart中，一个Isolate对象其实就是一个isolate执行环境的引用，一般来说我们都是通过当前的isolate去控制其他的isolate完成彼此之间的交互，而当我们想要创建一个新的Isolate可以使用Isolate.spawn方法获取返回的一个新的isolate对象，两个isolate之间使用SendPort相互发送消息，而isolate中也存在了一个与之对应的ReceivePort接受消息用来处理，但是我们需要注意的是，ReceivePort和SendPort在每个isolate都有一对，只有同一个isolate中的ReceivePort才能接受到当前类的SendPort发送的消息并且处理。
 
+方案 1：Flutter compute（最简单，推荐入门）
+>底层封装：Isolate.spawn + ReceivePort，自动处理消息、自动销毁隔离单元
+>⚠️ 限制：只能一次入参、一次返回结果，不支持持续交互
+
+```dart
+import 'package:flutter/foundation.dart';
+
+// 子Isolate执行函数：必须是【顶层函数/静态函数】，不能是类实例方法
+int heavyCompute(int count) {
+  int sum = 0;
+  for (int i = 0; i < count; i++) {
+    sum += i;
+  }
+  return sum;
+}
+
+// 在UI主线程调用
+Future<void> runComputeDemo() async {
+  print("开始计算");
+  // 将任务丢进独立Isolate并行执行
+  int result = await compute(heavyCompute, 100000000);
+  print("计算结果：$result");
+}
+```
+⚠️ compute 高频踩坑
+1. 计算函数不能是类成员方法（无法序列化闭包），必须顶层函数 /static；
+2. 传入和返回的数据必须是可序列化对象：基础类型、List、Map；不能携带 Widget、Context、SendPort 以外的 dart 对象；
+3. 每次调用 compute 会新建 + 销毁 Isolate，高频循环调用有性能开销，高频任务建议使用原生 spawn 复用 Isolate。
+
+方案 2：原生 Isolate.spawn（灵活，支持双向持续通信）
+>适合场景：多次下发计算任务、持续传回进度、流式数据。
+>流程模型：
+>主 Isolate 创建 ReceivePort，用于接收子 Isolate 消息
+>调用 Isolate.spawn 启动子隔离单元，把SendPort 传递给子 Isolate
+>子 Isolate 保存 SendPort，计算完成后发送结果
+>主 Isolate 监听 ReceivePort 获取数据
+>任务结束手动关闭端口、销毁 Isolate 释放内存
+
+完整示例（单次任务）
+
+```dart
+import 'dart:isolate';
+
+// 子Isolate入口函数，参数会收到主Isolate传过去的SendPort
+void isolateEntry(SendPort sendPort) {
+  int sum = 0;
+  for (int i = 0; i < 100000000; i++) {
+    sum += i;
+  }
+  // 发送结果回主线程
+  sendPort.send(sum);
+}
+
+Future<void> basicIsolateDemo() async {
+  // 1. 创建接收端口
+  final receivePort = ReceivePort();
+
+  // 2. 启动Isolate，把子Isolate需要的SendPort传进去
+  await Isolate.spawn(isolateEntry, receivePort.sendPort);
+
+  // 3. 监听子Isolate发来的消息
+  final result = await receivePort.first;
+  print("并行计算结果：$result");
+
+  // 关闭端口
+  receivePort.close();
+}
+```
+
 ---
 
 **5. 说一下Dart异步编程中的 Future关键字？** 
@@ -57,6 +124,31 @@ Dart 是单线程模型，运行的的流程如下图。
 **6. 说一下Dart异步编程中的 Stream数据流？** 
 
 在Dart中，Stream 和 Future 一样，都是用来处理异步编程的工具。它们的区别在于，Stream 可以接收多个异步结果，而Future 只有一个。 Stream 的创建可以使用 Stream.fromFuture，也可以使用 StreamController 来创建和控制。还有一个注意点是：普通的 Stream 只可以有一个订阅者，如果想要多订阅的话，要使用 asBroadcastStream()。
+
+Stream 监听后能收到三类通知：
+1. onData：正常数据
+2. onError：异常
+3. onDone：流关闭，传输结束
+
+
+```dart
+stream.listen(
+  (data) => print('收到数据：$data'),
+  onError: (e) => print('异常 $e'),
+  onDone: () => print('流结束'),
+);
+```
+
+```dart
+// 单订阅流示例
+Stream<int> stream = Stream.periodic(Duration(seconds:1), (i)=>i).take(3);
+var sub1 = stream.listen(print);
+// stream.listen(print); // 报错！不能第二个监听者
+```
+>⚠️ 重点：listen () 才会启动流！不监听，很多流不会产生数据（惰性）
+
+
+
 
 ---
 
@@ -164,7 +256,9 @@ Widget会被inflate（填充）到Element，并由Element管理底层渲染树�
 
 ---
 
-**8. 什么是状态管理，你了解哪些状态管理框架？** Flutter中的状态和前端React中的状态概念是一致的。React框架的核心思想是组件化，应用由组件搭建而成，组件最重要的概念就是状态，状态是一个组件的UI数据模型，是组件渲染时的数据依据。
+**8. 什么是状态管理，你了解哪些状态管理框架？** 
+
+Flutter中的状态和前端React中的状态概念是一致的。React框架的核心思想是组件化，应用由组件搭建而成，组件最重要的概念就是状态，状态是一个组件的UI数据模型，是组件渲染时的数据依据。
 
 Flutter的状态可以分为全局状态和局部状态两种。常用的状态管理有ScopedModel、BLoC、Redux / FishRedux和Provider。详细使用情况和差异可以自行了解。
 
@@ -180,7 +274,9 @@ Flutter只关心向 GPU提供视图数据，GPU的 VSync信号同步到 UI线程
 
 ---
 
-**10. 简述Flutter的线程管理模型** 默认情况下，Flutter Engine层会创建一个Isolate，并且Dart代码默认就运行在这个主Isolate上。必要时可以使用spawnUri和spawn两种方式来创建新的Isolate，在Flutter中，新创建的Isolate由Flutter进行统一的管理。 事实上，Flutter Engine自己不创建和管理线程，Flutter Engine线程的创建和管理是Embeder负责的，Embeder指的是将引擎移植到平台的中间层代码，Flutter Engine层的架构示意图如下图所示。
+**10. 简述Flutter的线程管理模型** 
+
+默认情况下，Flutter Engine层会创建一个Isolate，并且Dart代码默认就运行在这个主Isolate上。必要时可以使用spawnUri和spawn两种方式来创建新的Isolate，在Flutter中，新创建的Isolate由Flutter进行统一的管理。 事实上，Flutter Engine自己不创建和管理线程，Flutter Engine线程的创建和管理是Embeder负责的，Embeder指的是将引擎移植到平台的中间层代码，Flutter Engine层的架构示意图如下图所示。
 
 ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/162dcb745b174de0800a396668e0b8a8~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
 

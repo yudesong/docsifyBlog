@@ -187,22 +187,18 @@ Java的泛型是伪泛型，这是因为Java在编译期间，所有的泛型信
 
 下面是使用Kotlin和Java编写同一个注解的例子：
 
-=== "kotlin"
+``` kotlin
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FUNCTION)
+annotation class Post(
+    val domain: String = "default",
+    val path: String
+)
+```
 
-    ``` kotlin
-    @Retention(AnnotationRetention.RUNTIME)
-    @Target(AnnotationTarget.FUNCTION)
-    annotation class Post(
-        val domain: String = "default",
-        val path: String
-    )
-    ```
-
-=== "java"
-
-    ``` java
-    public @interface Post {
-        String domain()  default "default";
-        String path();
-    }
-    ```
+``` java
+public @interface Post {
+    String domain()  default "default";
+    String path();
+}
+```
