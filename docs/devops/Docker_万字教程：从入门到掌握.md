@@ -4,13 +4,6 @@ url: https://mp.weixin.qq.com/s/u2es87JU5FNlGo3qDLY_ng?color_scheme=light
 publishedTime: undefined
 ---
 
-##
-
-Datawhale干货
-
-**作者：杨世超，Datawhale成员  
-**
-
 ## 1\. Docker 介绍
 
 ### 1.1 Docker 简介
