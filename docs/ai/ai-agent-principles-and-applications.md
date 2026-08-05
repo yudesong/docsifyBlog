@@ -339,5 +339,3 @@ GPT4 在情商上显著高于以往其他大模型，随着大模型情商迭代
 
 展望未来，AI Agent技术有望在未来五年内实现跨越式发展，其普及程度将远超预期，深刻渗透并重塑千行百业的运作模式。我们期待，这一技术不仅能够在效率上实现质的飞跃，为传统行业带来颠覆性的改变，更能作为创新驱动的核心力量，开启一个智能互联、高效协同的新时代。让我们共同见证，AI Agent技术如何携手各行各业，绘制出一幅幅生动绚丽的智能未来图景。
 
-[**点击关注，第一时间了解华为云新鲜技术~**](https://bbs.huaweicloud.com/blogs?utm_source=juejin&utm_medium=bbs-ex&utm_campaign=other&utm_content=content "https://bbs.huaweicloud.com/blogs?utm_source=juejin&utm_medium=bbs-ex&utm_campaign=other&utm_content=content")
-

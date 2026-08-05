@@ -4,24 +4,6 @@ url: https://juejin.cn/post/7409191765708947465?searchId=20260805221458082150151
 publishedTime: 2024-09-02T08:04:40+08:00
 ---
 
-大家好，我是 LV。
-
-[《AI 赋能前端研发从 0 ～ 1》](https://ai.iamlv.cn/ "https://ai.iamlv.cn")发出去了之后，得到了很多伙伴的肯定，在这里感谢大家的认可～
-
-很多人在催更，尤其是如何基于公司私有组件生成代码的实操，大家都很关心 👇
-
-![](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/a9180d81dd324d53a0303e68c487141b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgTFbmioDmnK_mtL4=:q75.awebp?rk3s=f64ab15b&x-expires=1786149947&x-signature=GXQqXhSPDZr3j25CorDpvt21%2BAs%3D)
-
-![](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/e38cea2138874fa3968a28c57a7b0142~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgTFbmioDmnK_mtL4=:q75.awebp?rk3s=f64ab15b&x-expires=1786149947&x-signature=jC%2BIWXaJqe%2BXCg5LqcZf6DaDIxo%3D)
-
-本篇，重点讲解这部分的实操，这也是我切身实践的一些经验总结。
-
-相信你认真学习之后，也能够在公司的前端 AI 落地中迈出第一步！也是成为公司最懂 AI 的前端大佬的第一步！
-
-本篇`万字长文`！内容很干很充实，建议点赞收藏防失联，欢迎在评论区留下你的反馈和建议，不多说，开始～
-
-[欢迎加入最懂 AI 的前端伙伴们群](https://ai.iamlv.cn/me.html "https://ai.iamlv.cn/me.html")
-
 ## 问题分析与解决方案
 
 基于公司私有组件生成代码，这个问题的本质是：由于大模型的`训练数据集不包含`你公司的私有组件数据，因此不能够生成符合公司私有组件库的代码。
@@ -1004,11 +986,4 @@ RAG 检索运行的过程 👇
 - [Vercel AI SDK RAG](https://sdk.vercel.ai/docs/guides/rag-chatbot#embedding "https://sdk.vercel.ai/docs/guides/rag-chatbot#embedding")
 - [Embedding](https://jalammar.github.io/illustrated-word2vec/ "https://jalammar.github.io/illustrated-word2vec/")
 
----
-
-今天的分享就先到这～
-
-觉得有用的话，帮忙点个赞、也可以转发给更多的朋友看到。
-
-如果你对本文有任何疑问，欢迎在评论区留言交流。
 
