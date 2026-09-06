@@ -88,6 +88,20 @@
         },
         function (hook) {
           hook.doneEach(function () {
+            // 站点页脚：ICP 备案号
+            const content = document.querySelector('.content');
+            if (content && !content.querySelector('.site-footer')) {
+              const footer = document.createElement('footer');
+              footer.className = 'site-footer';
+              footer.innerHTML =
+                '<div class="site-footer-inner">' +
+                '<span class="site-footer-brand">YYDS\'s Blog</span>' +
+                '<span class="site-footer-divider">·</span>' +
+                '<a class="site-footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">粤ICP备2026128487号</a>' +
+                '</div>';
+              content.appendChild(footer);
+            }
+
             const sidebar = document.querySelector('.sidebar-nav');
             if (sidebar && !document.querySelector('.sidebar-theme-btn')) {
               const btn = document.createElement('button');
