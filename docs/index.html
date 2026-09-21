@@ -11,11 +11,36 @@
   <meta name="referrer" content="no-referrer" />
   <link rel="icon" href="./assets/images/favicon.webp">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/lib/themes/vue.css">
+  <!-- Catppuccin 配色层：Latte（浅色）/ Mocha（深色），accent = green -->
+  <link rel="stylesheet" href="https://docsify.catppuccin.com/latte/green.css" title="catppuccin-latte">
+  <link rel="stylesheet" href="https://docsify.catppuccin.com/mocha/green.css" title="catppuccin-mocha" disabled>
   <link rel="stylesheet" href="./stylesheets/docsify-extra.css">
+  <script>
+    // 提前应用 Catppuccin 配色，避免深色模式首屏闪烁
+    window.__applyCatppuccinTheme = function (isDark) {
+      document.querySelectorAll('link[title="catppuccin-latte"], link[title="catppuccin-mocha"]').forEach(function (link) {
+        link.disabled = link.title === ('catppuccin-' + (isDark ? 'latte' : 'mocha'));
+      });
+    };
+    (function () {
+      var isDark = false;
+      try { isDark = localStorage.getItem('theme-mode') === 'dark'; } catch (e) {}
+      window.__applyCatppuccinTheme(isDark);
+    })();
+  </script>
 </head>
 
 <body>
   <div id="app">加载中...</div>
+
+  <script>
+    // 首屏提前标记首页路由，避免独立布局闪烁
+    (function () {
+      var raw = (location.hash || '').replace(/^#\/?/, '').split('#')[0].split('?')[0];
+      var isHome = raw === '' || /^(\.\/)?README(\.md)?\/?$/.test(raw);
+      if (isHome) document.body.classList.add('is-home');
+    })();
+  </script>
 
   <script>
     window.$docsify = {
@@ -28,7 +53,6 @@
       subMaxLevel: 3,
       maxLevel: 4,
       relativePath: false,
-      themeColor: '#42b983',
       pagination: {
         previousText: '上一篇',
         nextText: '下一篇',
@@ -102,6 +126,21 @@
               content.appendChild(footer);
             }
 
+            // 首页「下滑浏览文章」：平滑滚动到文章区
+            const scrollCue = document.querySelector('.home-scroll-cue');
+            if (scrollCue && scrollCue.dataset.cueBound !== 'true') {
+              scrollCue.dataset.cueBound = 'true';
+              scrollCue.addEventListener('click', function (event) {
+                const target = document.getElementById('最新文章');
+                const scroller = document.querySelector('.content');
+                if (!target || !scroller) return;
+                event.preventDefault();
+                const top = scroller.scrollTop +
+                  target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 72;
+                scroller.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+              });
+            }
+
             const sidebar = document.querySelector('.sidebar-nav');
             if (sidebar && !document.querySelector('.sidebar-theme-btn')) {
               const btn = document.createElement('button');
@@ -115,14 +154,14 @@
               if (localStorage.getItem('theme-mode') === 'dark') {
                 document.body.classList.add('dark-mode');
               }
+              window.__applyCatppuccinTheme(document.body.classList.contains('dark-mode'));
 
               setThemeText();
               btn.onclick = function () {
                 document.body.classList.toggle('dark-mode');
-                localStorage.setItem(
-                  'theme-mode',
-                  document.body.classList.contains('dark-mode') ? 'dark' : 'light'
-                );
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+                window.__applyCatppuccinTheme(isDark);
                 setThemeText();
               };
 
@@ -163,6 +202,37 @@
 
             const currentRoute = getCurrentRoute();
             const isHome = !currentRoute || currentRoute === 'README' || currentRoute === './README';
+
+            // 首页为独立全屏落地页：切换布局状态
+            document.body.classList.toggle('is-home', isHome);
+
+            // 首页侧边栏隐藏，提供浮动主题切换按钮
+            const fab = document.querySelector('.home-theme-fab');
+            if (isHome) {
+              let fabBtn = fab;
+              if (!fabBtn) {
+                fabBtn = document.createElement('button');
+                fabBtn.type = 'button';
+                fabBtn.className = 'home-theme-fab';
+                document.body.appendChild(fabBtn);
+                fabBtn.addEventListener('click', function () {
+                  const dark = !document.body.classList.contains('dark-mode');
+                  document.body.classList.toggle('dark-mode', dark);
+                  localStorage.setItem('theme-mode', dark ? 'dark' : 'light');
+                  window.__applyCatppuccinTheme(dark);
+                  const sbBtn = document.querySelector('.sidebar-theme-btn');
+                  if (sbBtn) sbBtn.textContent = dark ? '切换浅色模式' : '切换深色模式';
+                  updateFabText();
+                });
+              }
+              const updateFabText = function () {
+                fabBtn.textContent = document.body.classList.contains('dark-mode') ? '浅色模式' : '深色模式';
+              };
+              updateFabText();
+            } else if (fab) {
+              fab.remove();
+            }
+
             const collapsedArticleSubnavKey = 'collapsed-article-subnav-route';
 
             const setCollapsedArticleSubnavRoute = function (route) {
