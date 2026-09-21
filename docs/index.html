@@ -172,16 +172,12 @@
             document.querySelectorAll('.markdown-section img').forEach(function (img) {
               const src = img.getAttribute('src');
               if (!src) return;
-              
-              const basePath = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-                ? '/'
-                : '/docsifyBlog/';
 
-              // 处理所有包含 /assets/ 的路径。本地使用 /assets/，线上 GitHub Pages 使用 /docsifyBlog/assets/。
+              // 自定义域名部署在根目录，本地 docsify serve 也在根目录，统一规范为 /assets/ 绝对路径。
               if (src.includes('/assets/')) {
                 const assetsIndex = src.indexOf('/assets/');
                 const relativePath = src.substring(assetsIndex + 1);
-                img.setAttribute('src', basePath + relativePath);
+                img.setAttribute('src', '/' + relativePath);
               }
             });
 
