@@ -725,6 +725,11 @@ body.home-page .reading-time {
   display: none !important;
 }
 
+/* 首页隐藏「下一篇」分页入口（首页无「上一篇」，隐藏容器即可），文章页不受影响 */
+body.home-page .pagination {
+  display: none;
+}
+
 body.home-page .content {
   position: static;
   left: 0;
