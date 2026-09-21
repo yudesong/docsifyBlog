@@ -104,16 +104,33 @@
             }
             if (content && !content.dataset.homeScrollBound) {
               content.dataset.homeScrollBound = 'true';
+              // 平滑滚动到目标元素：自实现 rAF 动画。
+              // 不用 scrollIntoView / 原生 smooth：docsify@5 的 <main> 是 overflow:auto 的
+              // 幻影滚动容器，scrollIntoView 会被它吃掉；根元素 CSS smooth 又会让逐帧滚动互相取消。
+              const smoothScrollTo = function (target) {
+                const startY = window.scrollY || document.documentElement.scrollTop || 0;
+                const endY = Math.max(target.getBoundingClientRect().top + startY, 0);
+                if (Math.abs(endY - startY) < 2) return;
+                const duration = Math.min(900, 320 + Math.abs(endY - startY) * 0.4);
+                const startTime = performance.now();
+                const step = function (now) {
+                  const progress = Math.min((now - startTime) / duration, 1);
+                  const ease = 1 - Math.pow(1 - progress, 3);
+                  window.scrollTo(0, startY + (endY - startY) * ease);
+                  if (progress < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+              };
               content.addEventListener('click', function (event) {
                 const link = event.target.closest('[data-home-scroll]');
                 if (!link) return;
                 event.preventDefault();
                 event.stopPropagation();
                 const target = document.getElementById(link.dataset.homeScroll);
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                if (target) smoothScrollTo(target);
               }, true);
             }
-            if (content && !isHomePage && !content.querySelector('.site-footer')) {
+            if (content && !content.querySelector('.site-footer')) {
               const footer = document.createElement('footer');
               footer.className = 'site-footer';
               footer.innerHTML =

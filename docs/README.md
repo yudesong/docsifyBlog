@@ -4,7 +4,7 @@
     <img class="home-avatar" src="./assets/images/bio-photo2.png" alt="YYDS" />
     <h1 class="home-title">YYDS's Blog</h1>
     <p class="home-tagline">Android Developer · Flutter · AI · 记录实践，持续分享</p>
-    <p class="home-intro">这里是我的技术笔记与长期积累，收录移动端开发、跨平台工程、人工智能和算法实践。</p>
+    <p class="home-intro"></p>
     <div class="home-links">
       <a class="home-link" href="#/" data-home-scroll="article-navigation">浏览文章 <span aria-hidden="true">↓</span></a>
       <a class="home-link home-link-ghost" href="https://github.com/yudesong" target="_blank" rel="noopener">GitHub ↗</a>

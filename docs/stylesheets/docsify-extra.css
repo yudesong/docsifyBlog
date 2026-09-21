@@ -706,10 +706,8 @@ body.dark-mode .tech-badge {
   .home-cards { grid-template-columns: 1fr; }
 }
 
-/* Home is a two-part scrolling page; article routes keep the Docsify shell. */
-html:has(body.home-page) {
-  scroll-behavior: smooth;
-}
+/* 首页为多屏滚动页；不要在根元素设置 scroll-behavior:smooth，
+   否则所有程序化滚动会被强制异步动画化并互相取消，导致按钮滚动失效。 */
 
 body.home-page .sidebar,
 body.home-page .app-nav,
@@ -726,7 +724,7 @@ body.home-page .reading-time {
 }
 
 /* 首页隐藏「下一篇」分页入口（首页无「上一篇」，隐藏容器即可），文章页不受影响 */
-body.home-page .pagination {
+body.home-page .docsify-pagination-container {
   display: none;
 }
 
@@ -805,10 +803,18 @@ body.home-page .home-tagline {
 body.home-page .home-link {
   border-radius: 4px;
   padding: 12px 24px;
+  /* 提高优先级覆盖 vue.css 的 .markdown-section a 链接色，避免绿字贴绿底 */
+  color: #fff !important;
+  background: var(--theme-color);
+}
+
+body.home-page .home-link:hover {
+  color: #fff !important;
+  opacity: 0.9;
 }
 
 body.home-page .home-link-ghost {
-  color: #fff;
+  color: #fff !important;
   border-color: rgba(255,255,255,.6);
 }
 
