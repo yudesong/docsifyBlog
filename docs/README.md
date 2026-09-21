@@ -1,12 +1,22 @@
-<div class="home-hero">
-  <img class="home-avatar" src="./assets/images/bio-photo2.png" alt="YYDS" />
-  <h1 class="home-title">YYDS's Blog</h1>
-  <p class="home-tagline">An Android Developer · 持续分享移动端与全栈技术</p>
-  <div class="home-links">
-    <a class="home-link" href="#/ai/vibe-coding-best-practices-guide.md">开始阅读</a>
-    <a class="home-link home-link-ghost" href="https://github.com/yudesong" target="_blank" rel="noopener">GitHub</a>
+<section id="top" class="home-hero">
+  <div class="home-hero-inner">
+    <p class="home-eyebrow">PERSONAL KNOWLEDGE BASE</p>
+    <img class="home-avatar" src="./assets/images/bio-photo2.png" alt="YYDS" />
+    <h1 class="home-title">YYDS's Blog</h1>
+    <p class="home-tagline">Android Developer · Flutter · AI · 记录实践，持续分享</p>
+    <p class="home-intro">这里是我的技术笔记与长期积累，收录移动端开发、跨平台工程、人工智能和算法实践。</p>
+    <div class="home-links">
+      <a class="home-link" href="#/" data-home-scroll="article-navigation">浏览文章 <span aria-hidden="true">↓</span></a>
+      <a class="home-link home-link-ghost" href="https://github.com/yudesong" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
   </div>
-</div>
+  <a class="home-scroll-cue" href="#/" data-home-scroll="article-navigation" aria-label="向下浏览文章导航"><span></span></a>
+</section>
+
+<section id="article-navigation" class="home-navigation">
+<p class="home-eyebrow">EXPLORE THE NOTES</p>
+<h2>文章导航</h2>
+<p class="home-section-intro">按主题进入文章，选择一个方向开始阅读。</p>
 
 <div class="home-tech-stack">
   <span class="tech-badge tech-android">Android</span>
@@ -19,7 +29,7 @@
   <span class="tech-badge tech-docker">Docker</span>
 </div>
 
-## 最新文章
+<h3>最新文章</h3>
 
 <div class="home-cards">
   <a class="home-card" href="#/ios/swift-basics.md">
@@ -74,15 +84,17 @@
   </a>
 </div>
 
-## 内容导航
+<h3>全部分类</h3>
+<div class="home-categories">
+  <a href="#/ai/vibe-coding-best-practices-guide.md"><strong>AI</strong><span>应用开发、Agent 原理与 Vibe Coding 实践</span></a>
+  <a href="#/android/framework/android-four-components-activity.md"><strong>Android</strong><span>Framework、源码解析与性能优化</span></a>
+  <a href="#/programming/java/java-foundation.md"><strong>Programming</strong><span>Java、Kotlin 与 Jetpack Compose</span></a>
+  <a href="#/flutter/dart_lang.md"><strong>Flutter</strong><span>Dart、框架原理与性能治理</span></a>
+  <a href="#/ios/swift-basics.md"><strong>iOS</strong><span>Swift 语言与 SwiftUI 实践</span></a>
+  <a href="#/leetcode/index.md"><strong>LeetCode</strong><span>算法题解与剑指 Offer</span></a>
+  <a href="#/website/docsify-site-building-guide.md"><strong>Web</strong><span>Docsify 建站与自动化部署</span></a>
+  <a href="#/devops/docker-tutorial.md"><strong>DevOps</strong><span>Docker 容器化与运维实践</span></a>
+</div>
 
-| 板块 | 简介 |
-| --- | --- |
-| **[AI](#/ai/vibe-coding-best-practices-guide.md)** | AI 应用开发、Agent 技术原理、Vibe Coding 实践、Building Skills 指南与 Kaggle 实战。 |
-| **[Android](#/android/framework/android-four-components-activity.md)** | Framework 核心机制（四大组件、Binder、消息机制、View 绘制与事件分发）、三方库源码解析（Glide、OkHttp、Retrofit、LeakCanary、Matrix 等）、性能优化与 APM。 |
-| **[Programming](#/programming/java/java-foundation.md)** | Java 基础与集合、Kotlin 语法与协程 Flow、Jetpack Compose 实践与性能优化。 |
-| **[Flutter](#/flutter/dart_lang.md)** | Dart 语言基础、Flutter 框架原理（编译、启动、渲染、图片加载）、状态管理、性能优化与稳定性治理。 |
-| **[iOS](#/ios/swift-basics.md)** | Swift 语言基础与进阶（泛型、协议、并发、Macros）、SwiftUI 声明式 UI 开发实战。 |
-| **[LeetCode](#/leetcode/index.md)** | 算法题解分类练习（数组、链表、树、动态规划等）与剑指 Offer。 |
-| **[Web](#/website/docsify-site-building-guide.md)** | Docsify 建站指南、VuePress + GitHub Actions 自动化部署。 |
-| **[DevOps](#/devops/docker-tutorial.md)** | Docker 容器化从入门到掌握，后续将扩展 K8s、CI/CD 等运维主题。 |
+<p class="home-backtop"><a href="#/" data-home-scroll="top">↑ 返回顶部</a></p>
+</section>
