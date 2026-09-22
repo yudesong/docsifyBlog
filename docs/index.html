@@ -15,6 +15,16 @@
 </head>
 
 <body>
+  <script>
+    // 首页路由提前标记：在 docsify 渲染内容前就给 body 加 home-page class，
+    // 避免「先渲染默认布局 → doneEach 才加 class」造成的样式闪烁
+    (function () {
+      var route = (location.hash || '').replace(/^#\/?/, '').split('?')[0];
+      if (!route || route === 'README' || route === 'README.md') {
+        document.body.classList.add('home-page');
+      }
+    })();
+  </script>
   <div id="app">加载中...</div>
 
   <script>
