@@ -98,7 +98,7 @@
         },
         function (hook) {
           hook.doneEach(function () {
-            // 站点页脚：ICP 备案号
+            // 站点页脚：ICP / 公安备案号
             const content = document.querySelector('.content');
             const route = location.hash.replace(/^#\/?/, '').split('?')[0];
             const isHomePage = !route || route === 'README' || route === 'README.md';
@@ -148,6 +148,8 @@
                 '<span class="site-footer-brand">YYDS\'s Blog</span>' +
                 '<span class="site-footer-divider">·</span>' +
                 '<a class="site-footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">粤ICP备2026128487号</a>' +
+                '<span class="site-footer-divider">·</span>' +
+                '<a class="site-footer-police" href="https://beian.mps.gov.cn/#/query/webSearch?code=44030002017577" target="_blank" rel="noopener noreferrer"><img class="site-footer-police-icon" src="/assets/images/beian.png" alt="" />粤公网安备44030002017577号</a>' +
                 '</div>';
               content.appendChild(footer);
             }

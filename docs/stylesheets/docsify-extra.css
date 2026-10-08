@@ -278,7 +278,7 @@ body {
   padding: 36px 36px 96px;
 }
 
-/* 站点页脚：ICP 备案号 */
+/* 站点页脚：ICP / 公安备案号 */
 .site-footer {
   position: relative;
   margin: 32px 0 0;
@@ -308,13 +308,28 @@ body {
   color: #c2cad3;
 }
 
-.site-footer-icp {
+.site-footer-icp,
+.site-footer-police {
   color: var(--muted-color);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.site-footer-icp:hover {
+.site-footer-police {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.site-footer-police-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  object-fit: contain;
+}
+
+.site-footer-icp:hover,
+.site-footer-police:hover {
   color: var(--theme-color);
   text-decoration: underline;
 }
@@ -328,7 +343,8 @@ body.dark-mode .site-footer-brand {
 }
 
 body.dark-mode .site-footer-inner,
-body.dark-mode .site-footer-icp {
+body.dark-mode .site-footer-icp,
+body.dark-mode .site-footer-police {
   color: var(--dark-muted);
 }
 
@@ -336,7 +352,8 @@ body.dark-mode .site-footer-divider {
   color: #4b5563;
 }
 
-body.dark-mode .site-footer-icp:hover {
+body.dark-mode .site-footer-icp:hover,
+body.dark-mode .site-footer-police:hover {
   color: var(--theme-color);
 }
 
