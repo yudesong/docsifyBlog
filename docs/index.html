@@ -39,7 +39,7 @@
     })();
   </script>
   <link rel="icon" href="./assets/images/favicon.webp">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/themes/vue.css">
+  <link rel="stylesheet" href="/_assets/css/vue.css">
   <link rel="stylesheet" href="./stylesheets/docsify-extra.css">
   <script>
     var _hmt = _hmt || [];
@@ -127,7 +127,7 @@
         function (hook) {
           // 重资源按需加载：mermaid（约 2MB）与 KaTeX（约 300KB）只在页面真正
           // 包含流程图 / 数学公式时才注入，绝大多数文章页首屏不再下载这两者。
-          var CDN = '//cdn.jsdelivr.net/npm/';
+          var CDN = '/_assets/';
           var loaded = {};
 
           function loadScript(src, onload) {
@@ -167,7 +167,7 @@
                 container.textContent = code.textContent;
                 code.parentElement.replaceWith(container);
               });
-              loadScript(CDN + 'mermaid@10.9.8/dist/mermaid.min.js', function () {
+              loadScript(CDN + 'js/mermaid.min.js', function () {
                 if (!window.mermaid) return;
                 if (!mermaid.__inited) {
                   mermaid.initialize({ startOnLoad: false });
@@ -181,9 +181,9 @@
             // 用官方 auto-render 扫描文本节点（自动跳过 code/pre），与原 docsify-katex 的 $ 语法行为一致。
             var section = document.querySelector('.markdown-section');
             if (section && /\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$/.test(section.textContent)) {
-              ensureCss(CDN + 'katex@0.19.0/dist/katex.min.css');
-              loadScript(CDN + 'katex@0.19.0/dist/katex.min.js', function () {
-                loadScript(CDN + 'katex@0.19.0/dist/contrib/auto-render.min.js', function () {
+              ensureCss(CDN + 'katex/katex.min.css');
+              loadScript(CDN + 'katex/katex.min.js', function () {
+                loadScript(CDN + 'katex/contrib/auto-render.min.js', function () {
                   if (window.renderMathInElement && section.isConnected) {
                     renderMathInElement(section, {
                       delimiters: [
@@ -514,18 +514,18 @@
   </script>
 
   <!-- 所有脚本 defer：不阻塞 HTML 解析；执行顺序与文档顺序一致（defer 保证） -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/docsify.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2.10.1/dist/docsify-pagination.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@3.0.2/dist/docsify-copy-code.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/plugins/zoom-image.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-count@1.1.0/dist/countable.js" defer></script>
+  <script src="/_assets/js/docsify.min.js" defer></script>
+  <script src="/_assets/js/docsify-pagination.min.js" defer></script>
+  <script src="/_assets/js/docsify-copy-code.min.js" defer></script>
+  <script src="/_assets/js/zoom-image.min.js" defer></script>
+  <script src="/_assets/js/countable.js" defer></script>
 
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-bash.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-java.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-kotlin.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-groovy.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-python.min.js" defer></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-yaml.min.js" defer></script>
+  <script src="/_assets/prism/prism-bash.min.js" defer></script>
+  <script src="/_assets/prism/prism-java.min.js" defer></script>
+  <script src="/_assets/prism/prism-kotlin.min.js" defer></script>
+  <script src="/_assets/prism/prism-groovy.min.js" defer></script>
+  <script src="/_assets/prism/prism-python.min.js" defer></script>
+  <script src="/_assets/prism/prism-yaml.min.js" defer></script>
 </body>
 
 </html>
