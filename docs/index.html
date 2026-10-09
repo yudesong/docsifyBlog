@@ -8,10 +8,49 @@
   <meta name="description" content="An Android Developer.">
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta name="referrer" content="no-referrer" />
+  <script>
+    // Referrer 策略按路由动态切换：
+    // 首页携带完整 Referer，保证百度统计可识别来源；
+    // 其他页面禁用 Referer，绕过知乎、掘金等图床防盗链。
+    (function () {
+      function getDocsifyRoute() {
+        var hash = location.hash || '';
+        var queryIndex = hash.indexOf('?');
+        if (queryIndex > -1) hash = hash.slice(0, queryIndex);
+        return hash.replace(/^#\/?/, '');
+      }
+
+      function applyDocsifyReferrerPolicy() {
+        var route = getDocsifyRoute();
+        var isHomePage = !route || route === 'README' || route === 'README.md';
+
+        var meta = document.querySelector('meta[name="referrer"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'referrer';
+          document.head.appendChild(meta);
+        }
+        meta.content = isHomePage ? 'unsafe-url' : 'no-referrer';
+      }
+
+      window.addEventListener('hashchange', applyDocsifyReferrerPolicy);
+      window.applyDocsifyReferrerPolicy = applyDocsifyReferrerPolicy;
+      applyDocsifyReferrerPolicy();
+    })();
+  </script>
   <link rel="icon" href="./assets/images/favicon.webp">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/lib/themes/vue.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/themes/vue.css">
   <link rel="stylesheet" href="./stylesheets/docsify-extra.css">
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement('script');
+      hm.src = 'https://hm.baidu.com/hm.js?520d4076b01a30133ebe7a9659254760';
+      hm.async = true;
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 </head>
 
 <body>
@@ -53,6 +92,9 @@
       plugins: [
         function (hook) {
           hook.beforeEach(function (content) {
+            // 渲染前先切换 Referrer 策略，避免外链图片按旧策略提前加载
+            window.applyDocsifyReferrerPolicy && window.applyDocsifyReferrerPolicy();
+
             const meta = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n/);
             const metaTitle = meta && meta[1].match(/^title:\s*["']?(.+?)["']?\s*$/m);
             content = content.replace(/^---[\s\S]*?\n---\s*\n/, '');
@@ -83,16 +125,76 @@
           });
         },
         function (hook) {
-          hook.doneEach(function () {
-            document.querySelectorAll('pre[data-lang="mermaid"] code').forEach(function (code) {
-              const container = document.createElement('div');
-              container.className = 'mermaid';
-              container.textContent = code.textContent;
-              code.parentElement.replaceWith(container);
-            });
+          // 重资源按需加载：mermaid（约 2MB）与 KaTeX（约 300KB）只在页面真正
+          // 包含流程图 / 数学公式时才注入，绝大多数文章页首屏不再下载这两者。
+          var CDN = '//cdn.jsdelivr.net/npm/';
+          var loaded = {};
 
-            if (window.mermaid) {
-              mermaid.run({ querySelector: '.mermaid' }).catch(function () {});
+          function loadScript(src, onload) {
+            if (loaded[src]) {
+              if (loaded[src] === 'done' && onload) onload();
+              return;
+            }
+            loaded[src] = 'loading';
+            var s = document.createElement('script');
+            s.src = src;
+            s.onload = function () {
+              loaded[src] = 'done';
+              if (onload) onload();
+            };
+            s.onerror = function () {
+              loaded[src] = null;
+            };
+            document.head.appendChild(s);
+          }
+
+          function ensureCss(href) {
+            if (document.querySelector('link[data-lazy-css="' + href + '"]')) return;
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.setAttribute('data-lazy-css', href);
+            link.href = href;
+            document.head.appendChild(link);
+          }
+
+          hook.doneEach(function () {
+            // —— mermaid：存在 ```mermaid 代码块时才加载 ——
+            var mermaidCode = document.querySelectorAll('pre[data-lang="mermaid"] code');
+            if (mermaidCode.length) {
+              mermaidCode.forEach(function (code) {
+                var container = document.createElement('div');
+                container.className = 'mermaid';
+                container.textContent = code.textContent;
+                code.parentElement.replaceWith(container);
+              });
+              loadScript(CDN + 'mermaid@10.9.8/dist/mermaid.min.js', function () {
+                if (!window.mermaid) return;
+                if (!mermaid.__inited) {
+                  mermaid.initialize({ startOnLoad: false });
+                  mermaid.__inited = true;
+                }
+                mermaid.run({ querySelector: '.mermaid' }).catch(function () {});
+              });
+            }
+
+            // —— KaTeX：渲染后的正文里检测到 $...$ / $$...$$ 才加载 ——
+            // 用官方 auto-render 扫描文本节点（自动跳过 code/pre），与原 docsify-katex 的 $ 语法行为一致。
+            var section = document.querySelector('.markdown-section');
+            if (section && /\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$/.test(section.textContent)) {
+              ensureCss(CDN + 'katex@0.19.0/dist/katex.min.css');
+              loadScript(CDN + 'katex@0.19.0/dist/katex.min.js', function () {
+                loadScript(CDN + 'katex@0.19.0/dist/contrib/auto-render.min.js', function () {
+                  if (window.renderMathInElement && section.isConnected) {
+                    renderMathInElement(section, {
+                      delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                      ],
+                      throwOnError: false
+                    });
+                  }
+                });
+              });
             }
           });
         },
@@ -411,28 +513,19 @@
     };
   </script>
 
-  <script src="//cdn.jsdelivr.net/npm/docsify@5/lib/docsify.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@latest/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@latest/dist/docsify-copy-code.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@5/lib/plugins/zoom-image.min.js"></script>
-  <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
+  <!-- 所有脚本 defer：不阻塞 HTML 解析；执行顺序与文档顺序一致（defer 保证） -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/docsify.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2.10.1/dist/docsify-pagination.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@3.0.2/dist/docsify-copy-code.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@5.0.0/lib/plugins/zoom-image.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-count@1.1.0/dist/countable.js" defer></script>
 
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-java.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-kotlin.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-groovy.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-python.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@latest/components/prism-yaml.min.js"></script>
-
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
-  <script src="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/marked@3"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
-
-  <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <script>
-    mermaid.initialize({ startOnLoad: false });
-  </script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-bash.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-java.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-kotlin.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-groovy.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-python.min.js" defer></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-yaml.min.js" defer></script>
 </body>
 
 </html>
